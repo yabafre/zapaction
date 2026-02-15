@@ -1,0 +1,20 @@
+{
+  "name": "@zapaction/example-next-app",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@tanstack/react-query": ">=5",
+    "@zapaction/core": "workspace:*",
+    "@zapaction/query": "workspace:*",
+    "next": ">=15",
+    "react": ">=18.3",
+    "react-dom": ">=18.3",
+    "zod": ">=3"
+  }
+}
