@@ -1,0 +1,15 @@
+# Premiere action
+
+```ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const listUsers = defineAction({
+  input: z.object({}),
+  output: z.array(z.object({ id: z.string(), name: z.string() })),
+  tags: ["users"],
+  handler: async () => [],
+});
+```
+
+Ensuite connectez votre premier hook de lecture avec `useActionQuery` et une feature key.

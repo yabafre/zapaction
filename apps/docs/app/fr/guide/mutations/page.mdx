@@ -1,0 +1,14 @@
+# Mutations
+
+Utilisez `useActionMutation` pour les ecritures.
+
+```tsx
+const mutation = useActionMutation(createUser);
+await mutation.mutateAsync({ name: "Alex" });
+```
+
+## Invalidation
+
+- Defaut: utilise `action.tags`
+- Override: `invalidateWithTags`
+- Desactivation: `invalidateOnSuccess: false`

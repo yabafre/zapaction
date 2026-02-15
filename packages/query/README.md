@@ -2,6 +2,13 @@
 
 TanStack Query integration for ZapAction actions.
 
+## Install
+
+```bash
+npm install @zapaction/query @zapaction/core @tanstack/react-query react
+# or pnpm/yarn/bun
+```
+
 ## Exports
 
 - `useActionQuery`
@@ -9,32 +16,18 @@ TanStack Query integration for ZapAction actions.
 - `setTagRegistry`
 - `invalidateTags`
 
-## Tag Mapping Contract
-
-Register tags once during bootstrap:
-
-```ts
-setTagRegistry({
-  users: [usersKeys.all()],
-})
-```
-
-Mutations can invalidate automatically from `action.tags`:
-
-```ts
-const mutation = useActionMutation(createUser)
-```
-
-`useActionQuery` requires explicit read intent:
-
-```ts
-useActionQuery(listUsers, {
-  input: {},
-  queryKey: usersKeys.all(),
-  readPolicy: "read-only",
-})
-```
-
 ## Best Practice
 
-Use query keys created by `createQueryKeys` from `@zapaction/core` and keep one canonical key factory per domain.
+- Keep feature-scoped keys in one place.
+- Register tag mappings once during app bootstrap.
+- Use `useActionQuery` only for read operations.
+
+```ts
+const usersKeys = createFeatureKeys("users", {
+  list: () => [],
+});
+
+setTagRegistry({
+  users: [usersKeys.list()],
+});
+```

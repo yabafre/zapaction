@@ -2,43 +2,39 @@
 
 Core contracts for ZapAction.
 
+## Install
+
+```bash
+npm install @zapaction/core zod
+# or pnpm/yarn/bun
+```
+
 ## Exports
 
 - `defineAction`
 - `setActionContext`
 - `createQueryKeys`
+- `createFeatureKeys`
+- `createFeatureTags`
 - `revalidateTags`
 
-## API
+## Feature-first helpers
 
 ```ts
-type DefinedAction<TInput, TOutput> = {
-  (input: TInput): Promise<TOutput>
-  tags?: readonly string[]
-}
+const productsKeys = createFeatureKeys("products", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
 
-type DefineActionOptions<TInput, TOutput, TContext> = {
-  input: ZodType<TInput>
-  output?: ZodType<TOutput>
-  tags?: readonly string[]
-  handler: (args: { input: TInput; ctx: TContext }) => Promise<TOutput>
-}
-
-declare function defineAction<TInput, TOutput, TContext = unknown>(
-  options: DefineActionOptions<TInput, TOutput, TContext>
-): DefinedAction<TInput, TOutput>
-
-declare function setActionContext<TContext>(
-  factory: () => Promise<TContext> | TContext
-): void
+const productsTags = createFeatureTags("products", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
 ```
 
 ## Notes
 
-- `defineAction` returns a standard async function compatible with Next.js Server Actions.
-- Errors are passthrough only (no result envelope).
-- `setActionContext` must be configured in a server-only bootstrap module.
-
-## Migration Note
-
-Future versions can add APIs, but changing `defineAction` signature is a breaking change.
+- `defineAction` returns a standard async function.
+- Errors are passthrough.
+- `setActionContext` must run in a server-only bootstrap.
+- `createQueryKeys` remains available as the low-level API.

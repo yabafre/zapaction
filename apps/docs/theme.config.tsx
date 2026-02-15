@@ -1,8 +1,8 @@
 const config = {
   docsRepositoryBase: "https://github.com/yabafre/zapaction/tree/main/apps/docs",
-  editLink: "Edit this page on GitHub →",
+  editLink: "Edit this page on GitHub ->",
   feedback: {
-    content: "Question? Give feedback →",
+    content: "Question? Give feedback ->",
     labels: "feedback",
   },
   navigation: true,

@@ -5,5 +5,10 @@ export {
   type ActionResult,
 } from "./defineAction";
 export { setActionContext } from "./context";
-export { createQueryKeys, type QueryKey } from "./queryKeys";
+export {
+  createQueryKeys,
+  createFeatureKeys,
+  createFeatureTags,
+  type QueryKey,
+} from "./queryKeys";
 export { revalidateTags } from "./revalidateTags";

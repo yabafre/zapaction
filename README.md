@@ -1,27 +1,60 @@
 # ZapAction
 
-Type-safe Server Actions with React and React Query for Next.js 15+.
+Keep Next.js Server Actions and React Query in sync.
 
 ## Compatibility
 
-- Next.js `>= 15` (App Router + Server Actions required)
+- Next.js `>= 15`
 - React `>= 18.3`
 - TanStack Query `>= 5`
-- Zod `>= 4`
+- Zod `>= 3`
 
-## Install
+## Package Managers
+
+ZapAction works with all major package managers.
 
 ```bash
+npm install @zapaction/core @zapaction/react @zapaction/query zod
+# or
 pnpm add @zapaction/core @zapaction/react @zapaction/query zod
+# or
+yarn add @zapaction/core @zapaction/react @zapaction/query zod
+# or
+bun add @zapaction/core @zapaction/react @zapaction/query zod
 ```
 
-## MVP Public APIs
+## 10-line Example
+
+```ts
+const usersKeys = createFeatureKeys("users", {
+  list: () => [],
+});
+
+const getUsers = defineAction({
+  input: z.object({}),
+  output: z.array(z.object({ id: z.string(), name: z.string() })),
+  tags: ["users"],
+  handler: async () => db.user.findMany(),
+});
+```
+
+```tsx
+const users = useActionQuery(getUsers, {
+  input: {},
+  queryKey: usersKeys.list(),
+  readPolicy: "read-only",
+});
+```
+
+## Public APIs
 
 ### `@zapaction/core`
 
 - `defineAction`
 - `setActionContext`
 - `createQueryKeys`
+- `createFeatureKeys`
+- `createFeatureTags`
 - `revalidateTags`
 
 ### `@zapaction/react`
@@ -35,35 +68,12 @@ pnpm add @zapaction/core @zapaction/react @zapaction/query zod
 - `setTagRegistry`
 - `invalidateTags`
 
-## Non-goals (v0.1)
+## Repo vs Library Tooling
 
-- No optimistic updates
-- No retry/timeouts policy layer
-- No FormData helpers
-- No RBAC middleware layer
-- No OpenAPI/codegen module
+- Contributors: this monorepo uses `pnpm` + Turborepo.
+- Consumers: the published packages work with npm, pnpm, yarn, and bun.
 
-## Quick Start
-
-```ts
-import { defineAction, setActionContext } from "@zapaction/core";
-import { z } from "zod";
-
-setActionContext(() => ({ tenantId: "demo" }));
-
-export const createUser = defineAction({
-  input: z.object({ name: z.string().min(1) }),
-  output: z.object({ id: z.string(), name: z.string(), tenantId: z.string() }),
-  tags: ["users"],
-  handler: async ({ input, ctx }) => ({
-    id: crypto.randomUUID(),
-    name: input.name,
-    tenantId: ctx.tenantId,
-  }),
-});
-```
-
-## Monorepo Commands (Turbo)
+## Monorepo Commands
 
 ```bash
 pnpm install
@@ -73,21 +83,3 @@ pnpm run build
 pnpm run typecheck
 pnpm run test
 ```
-
-- `pnpm run dev`: docs only (`@zapaction/docs`)
-- `pnpm run dev:all`: all workspace dev tasks
-
-## Docs App
-
-```bash
-pnpm turbo run dev --filter=@zapaction/docs
-pnpm turbo run build --filter=@zapaction/docs...
-```
-
-The docs app uses Next.js App Router + Nextra and resolves local workspace packages under `@zapaction/*`.
-
-## Vercel Deployment (Docs)
-
-- Root Directory: repository root
-- Build Command: `pnpm turbo run build --filter=@zapaction/docs...`
-- Output Directory: `apps/docs/.next`

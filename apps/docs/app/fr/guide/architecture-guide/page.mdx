@@ -1,0 +1,28 @@
+# Architecture Guide
+
+## Regles de layering
+
+- Les composants n'appellent jamais les actions directement.
+- Les composants appellent des hooks de feature.
+- Les hooks de feature appellent les hooks ZapAction.
+- Les actions s'executent uniquement cote serveur.
+
+## Flux de reference
+
+```txt
+RSC -> Client Component -> Feature Hook -> ZapAction Hook -> Server Action
+```
+
+## Anti-pattern
+
+```tsx
+// A eviter: le composant appelle l'action directement
+await createProduct({ name: "X" });
+```
+
+## Pattern recommande
+
+```tsx
+const mutation = useCreateProduct();
+await mutation.mutateAsync({ name: "X" });
+```

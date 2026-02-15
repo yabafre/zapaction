@@ -1,0 +1,23 @@
+# CRUD Users
+
+```ts
+const usersKeys = createFeatureKeys("users", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
+
+export const listUsers = defineAction({
+  input: z.object({}),
+  output: z.array(userSchema),
+  tags: ["users"],
+  handler: async () => db.user.findMany(),
+});
+```
+
+```tsx
+const users = useActionQuery(listUsers, {
+  input: {},
+  queryKey: usersKeys.list(),
+  readPolicy: "read-only",
+});
+```

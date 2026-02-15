@@ -1,0 +1,32 @@
+# Feature Structure
+
+Pattern officiel ZapAction:
+
+```txt
+features/
+  products/
+    _actions/
+    _hooks/
+    _queries/
+    _components/
+```
+
+## Pourquoi ce pattern fonctionne
+
+- Ownership clair par feature
+- Localite pour keys, tags, hooks et UI
+- Migration simple du petit module vers un gros module
+
+## Exemple module product
+
+```ts
+export const productKeys = createFeatureKeys("products", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
+
+export const productTags = createFeatureTags("products", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
+```

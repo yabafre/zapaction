@@ -1,0 +1,13 @@
+# Client Data Fetching
+
+`useActionQuery` is read-only by policy.
+
+```tsx
+const query = useActionQuery(getUsers, {
+  input: {},
+  queryKey: usersKeys.list(),
+  readPolicy: "read-only",
+});
+```
+
+Do not use this for writes.

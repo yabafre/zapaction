@@ -2,6 +2,13 @@
 
 React hook primitives for ZapAction.
 
+## Install
+
+```bash
+npm install @zapaction/react react
+# or pnpm/yarn/bun
+```
+
 ## Exports
 
 - `useAction`
@@ -9,14 +16,7 @@ React hook primitives for ZapAction.
 ## Usage
 
 ```tsx
-const { execute, status, data, error } = useAction(createUser)
+const { execute, status, data, error } = useAction(createUser);
 ```
 
-`useAction` tracks state transitions:
-
-- `idle`
-- `pending`
-- `success`
-- `error`
-
-For TanStack Query integration, use `@zapaction/query`.
+For cache-aware query/mutation flows, use `@zapaction/query`.

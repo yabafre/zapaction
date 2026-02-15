@@ -1,0 +1,17 @@
+# Error Handling
+
+ZapAction keeps error passthrough semantics.
+
+- Zod validation errors are thrown.
+- Handler errors are thrown.
+- No envelope conversion at runtime.
+
+## Client pattern
+
+```tsx
+try {
+  await mutation.mutateAsync(input);
+} catch (error) {
+  // map to UI-safe messaging here
+}
+```

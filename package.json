@@ -1,6 +1,6 @@
 {
   "name": "zapaction",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "description": "ZapAction monorepo",
   "license": "MIT",
@@ -19,7 +19,9 @@
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "release:prepare-packages": "node scripts/rewrite-workspace-deps.mjs",
+    "release:dry-run": "node scripts/rewrite-workspace-deps.mjs --dry-run"
   },
   "devDependencies": {
     "@tanstack/react-query": "^5.90.1",

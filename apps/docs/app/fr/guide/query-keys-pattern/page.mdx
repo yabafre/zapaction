@@ -1,0 +1,17 @@
+# Pattern Query Keys
+
+Utilisez des keys scopees par feature au lieu d'une factory globale.
+
+```ts
+export const usersKeys = createFeatureKeys("users", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
+```
+
+## Sortie
+
+- `usersKeys.list()` -> `["users"]`
+- `usersKeys.detail("42")` -> `["users", "42"]`
+
+Les keys doivent rester JSON-serializables.

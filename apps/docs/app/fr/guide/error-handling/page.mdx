@@ -1,0 +1,17 @@
+# Error Handling
+
+ZapAction garde une semantique de propagation d'erreur.
+
+- Les erreurs de validation Zod sont throw.
+- Les erreurs handler sont throw.
+- Pas d'enveloppe runtime.
+
+## Pattern client
+
+```tsx
+try {
+  await mutation.mutateAsync(input);
+} catch (error) {
+  // mapper vers un message UI ici
+}
+```

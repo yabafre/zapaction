@@ -1,0 +1,27 @@
+# Setup
+
+## 1) Register server context
+
+```ts
+// app/bootstrap.server.ts
+import "server-only";
+
+import { setActionContext } from "@zapaction/core";
+
+setActionContext(async () => ({
+  tenantId: "demo-tenant",
+}));
+```
+
+## 2) Register tag registry
+
+```ts
+// app/bootstrap.client.ts
+"use client";
+
+import { setTagRegistry } from "@zapaction/query";
+
+setTagRegistry({
+  users: [["users"]],
+});
+```

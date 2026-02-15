@@ -1,0 +1,30 @@
+# Project Setup (Structure recommandee)
+
+Utilisez une structure feature-first des le debut.
+
+```txt
+src/
+  features/
+    users/
+      _actions/
+      _queries/
+      _hooks/
+      _components/
+```
+
+## Flux d'appel
+
+```txt
+RSC Page
+  -> Client Component
+    -> useUsers()
+      -> useActionQuery() / useActionMutation()
+        -> Server Action
+```
+
+## Regle pratique
+
+- Les composants n'appellent jamais les actions directement.
+- Les composants appellent des hooks.
+- Les hooks appellent les hooks ZapAction.
+- Les server actions restent server-only.

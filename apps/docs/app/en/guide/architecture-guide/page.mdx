@@ -1,0 +1,28 @@
+# Architecture Guide
+
+## Layering rules
+
+- Components never call actions directly.
+- Components call feature hooks.
+- Feature hooks call ZapAction hooks.
+- Actions run only on the server.
+
+## Reference flow
+
+```txt
+RSC -> Client Component -> Feature Hook -> ZapAction Hook -> Server Action
+```
+
+## Anti-pattern
+
+```tsx
+// Avoid: component calls action directly
+await createProduct({ name: "X" });
+```
+
+## Preferred
+
+```tsx
+const mutation = useCreateProduct();
+await mutation.mutateAsync({ name: "X" });
+```

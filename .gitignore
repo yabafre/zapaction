@@ -54,6 +54,7 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
+.release-tmp/
 # .mcp.json contains secrets - never commit
 .mcp.json
 

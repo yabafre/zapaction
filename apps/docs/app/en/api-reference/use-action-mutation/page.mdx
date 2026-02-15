@@ -1,0 +1,14 @@
+# useActionMutation
+
+Use for write paths.
+
+```tsx
+const mutation = useActionMutation(createUser);
+await mutation.mutateAsync({ name: "Alex" });
+```
+
+## Invalidation
+
+- By default uses `action.tags`
+- Can be overridden with `invalidateWithTags`
+- Can be disabled with `invalidateOnSuccess: false`

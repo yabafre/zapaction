@@ -1,0 +1,27 @@
+# defineAction
+
+`defineAction` est le contrat serveur principal.
+
+```ts
+defineAction({
+  input: z.object(...),
+  output: z.object(...),
+  tags: ["users"],
+  handler: async ({ input, ctx }) => { ... },
+});
+```
+
+## Validation
+
+- L'input est valide avant execution du handler.
+- L'output est valide avant retour.
+- Les erreurs de validation sont throw directement.
+
+## Contexte
+
+- Enregistrez une fois avec `setActionContext(factory)` au bootstrap serveur.
+- Le contexte est resolu a chaque invocation.
+
+## Politique d'erreur
+
+ZapAction ne wrap pas les erreurs dans une envelope de resultat.

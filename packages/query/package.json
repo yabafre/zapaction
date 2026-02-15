@@ -1,6 +1,6 @@
 {
   "name": "@zapaction/query",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "React Query integration for ZapAction with tag-driven invalidation",
   "license": "MIT",
   "type": "module",
@@ -36,7 +36,6 @@
   },
   "peerDependencies": {
     "@tanstack/react-query": ">=5",
-    "next": ">=15",
     "react": ">=18.3"
   }
 }

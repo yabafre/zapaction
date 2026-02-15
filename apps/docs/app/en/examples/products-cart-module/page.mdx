@@ -1,0 +1,38 @@
+# Products + Cart Module
+
+```txt
+features/
+  products/
+    _actions/
+    _queries/
+    _hooks/
+    _components/
+  cart/
+    _actions/
+    _queries/
+    _hooks/
+    _components/
+```
+
+```ts
+export const productsKeys = createFeatureKeys("products", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
+
+export const cartKeys = createFeatureKeys("cart", {
+  active: (userId: string) => [userId],
+});
+
+export const productsTags = createFeatureTags("products", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
+
+export const addToCart = defineAction({
+  input: addToCartSchema,
+  output: cartItemSchema,
+  tags: [productsTags.list(), ["cart"]],
+  handler: async ({ input }) => db.cartItem.create({ data: input }),
+});
+```

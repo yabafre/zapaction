@@ -1,0 +1,24 @@
+# Pattern Cache Tags
+
+Les tags pilotent l'invalidation entre serveur et client.
+
+```ts
+export const usersTags = createFeatureTags("users", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
+```
+
+## Exemple
+
+```ts
+export const createUser = defineAction({
+  input: schema,
+  output: outputSchema,
+  tags: [usersTags.list()],
+  handler: async ({ input }) => db.user.create({ data: input }),
+});
+```
+
+- Revalidation serveur: `revalidateTag`
+- Invalidation client: tag registry -> `invalidateQueries`

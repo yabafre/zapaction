@@ -1,0 +1,33 @@
+# Qu'est-ce que ZapAction
+
+ZapAction est une couche framework qui garde Next.js Server Actions et React Query synchronises avec un contrat previsible.
+
+## Capacites principales
+
+- `defineAction` avec validation typee input/output
+- Cohesion de cache par tags entre serveur et client
+- Patterns feature-first pour les vrais projets
+- Hooks query alignes sur les contrats serveur
+
+## Flux en 10 lignes
+
+```ts
+const usersKeys = createFeatureKeys("users", {
+  list: () => [],
+});
+
+export const getUsers = defineAction({
+  input: z.object({}),
+  output: z.array(z.object({ id: z.string(), name: z.string() })),
+  tags: ["users"],
+  handler: async () => db.user.findMany(),
+});
+```
+
+```tsx
+const { data } = useActionQuery(getUsers, {
+  input: {},
+  queryKey: usersKeys.list(),
+  readPolicy: "read-only",
+});
+```
