@@ -2,24 +2,26 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "preserve",
-    "allowJs": false,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "noEmit": true,
+    "allowJs": true,
     "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "noEmit": true
   },
   "include": [
+    "next-env.d.ts",
     "app",
-    "components",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "theme.config.tsx",
+    "mdx-components.tsx"
   ],
   "exclude": [
     "node_modules"

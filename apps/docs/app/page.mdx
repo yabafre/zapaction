@@ -1,0 +1,47 @@
+# ZapAction
+
+Keep Next Server Actions and React Query in sync automatically.
+
+## Complete Working Flow
+
+```ts
+// app/actions.ts
+"use server";
+
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const createUser = defineAction({
+  input: z.object({ name: z.string().min(1) }),
+  output: z.object({ id: z.string(), name: z.string() }),
+  tags: ["users"],
+  handler: async ({ input }) => ({ id: crypto.randomUUID(), name: input.name }),
+});
+```
+
+```tsx
+// components/create-user.tsx
+"use client";
+
+import { useActionMutation } from "@zapaction/query";
+import { createUser } from "../app/actions";
+
+export function CreateUserButton() {
+  const mutation = useActionMutation(createUser);
+
+  return (
+    <button onClick={() => mutation.mutate({ name: "Alex" })} disabled={mutation.isPending}>
+      {mutation.isPending ? "Creating..." : "Create user"}
+    </button>
+  );
+}
+```
+
+No manual `revalidateTag` + `invalidateQueries` wiring in each component. Action metadata drives cache orchestration.
+
+## Why ZapAction
+
+- Server Actions remain native functions
+- Zod validation and typing stay in one place
+- Tags unify server revalidation and client invalidation
+- React Query hooks work with action contracts directly

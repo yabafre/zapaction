@@ -1,0 +1,27 @@
+# Full Example
+
+The full working flow lives in `examples/next-app`.
+
+## Key files
+
+- `examples/next-app/app/actions.ts`
+- `examples/next-app/app/bootstrap.server.ts`
+- `examples/next-app/app/bootstrap.client.ts`
+- `examples/next-app/app/query-keys.ts`
+- `examples/next-app/components/users-panel.tsx`
+
+## What to look for
+
+1. Action contracts declared once with `defineAction`
+2. Context bootstrapped server-side
+3. Tag registry bootstrapped client-side
+4. Mutation and query hooks using inferred types
+5. Tags driving cache sync across server and client
+
+## Run locally
+
+```bash
+pnpm install
+pnpm turbo run dev --filter=@zapaction/docs
+pnpm --filter @zapaction/example-next-app dev
+```

@@ -1,0 +1,34 @@
+# Core
+
+`@zapaction/core` is the contract layer.
+
+## `defineAction`
+
+```ts
+defineAction({
+  input: z.object(...),
+  output: z.object(...),
+  tags: ["users"],
+  handler: async ({ input, ctx }) => { ... }
+});
+```
+
+## Validation
+
+- Input is validated before handler execution
+- Output is validated before returning to caller
+- Validation errors are thrown directly
+
+## Context
+
+- Register once with `setActionContext(factory)`
+- Context is resolved server-side for each action call
+- Missing context bootstrap fails fast
+
+## Error policy
+
+Errors are passthrough:
+
+- Zod errors are thrown as-is
+- Handler errors are thrown as-is
+- No `{ success, error }` envelope is introduced

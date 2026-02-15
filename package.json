@@ -14,10 +14,12 @@
   "homepage": "https://github.com/yabafre/zapaction#readme",
   "packageManager": "pnpm@10.6.0",
   "scripts": {
-    "build": "pnpm -r run build",
-    "typecheck": "pnpm -r run typecheck",
-    "test": "pnpm -r run test",
-    "lint": "pnpm -r --if-present run lint"
+    "dev": "turbo run dev --filter=@zapaction/docs",
+    "dev:all": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "turbo run lint"
   },
   "devDependencies": {
     "@tanstack/react-query": "^5.90.1",
@@ -26,9 +28,10 @@
     "next": "^15.5.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "turbo": "^2.5.8",
     "tsup": "^8.4.0",
     "typescript": "^5.7.3",
     "vitest": "^2.1.8",
-    "zod": "^3.25.76"
+    "zod": "^4.3.6"
   }
 }

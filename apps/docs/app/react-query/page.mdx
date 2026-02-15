@@ -1,0 +1,31 @@
+# React Query
+
+## `useActionMutation`
+
+Use mutations for write operations. Tags on the action trigger invalidation automatically.
+
+```tsx
+const mutation = useActionMutation(createUser);
+await mutation.mutateAsync({ name: "Alex" });
+```
+
+## `useActionQuery`
+
+Use queries only for read actions. Enforce explicit read intent.
+
+```tsx
+const query = useActionQuery(listUsers, {
+  input: {},
+  queryKey: ["users"],
+  readPolicy: "read-only",
+});
+```
+
+## Anti-pattern
+
+Do not use `useActionQuery` for mutating actions.
+
+```tsx
+// Bad: write action in query
+useActionQuery(createUser, { input: { name: "Alex" }, queryKey: ["users"], readPolicy: "read-only" });
+```

@@ -1,0 +1,29 @@
+# Cache Tags
+
+Tags are the cache coherence contract across server and client.
+
+## Registry
+
+```ts
+import { setTagRegistry } from "@zapaction/query";
+
+setTagRegistry({
+  users: [["users"]],
+});
+```
+
+## Action metadata
+
+```ts
+const createUser = defineAction({
+  input: z.object({ name: z.string() }),
+  tags: ["users"],
+  handler: async ({ input }) => ({ id: "1", name: input.name }),
+});
+```
+
+## Runtime behavior
+
+- Server: tags trigger `revalidateTag` through `revalidateTags`
+- Client: tags trigger `queryClient.invalidateQueries` through `invalidateTags`
+- No tags: no server revalidation and no client invalidation
