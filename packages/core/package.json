@@ -1,6 +1,8 @@
 {
   "name": "@zapaction/core",
   "version": "0.1.0",
+  "description": "Type-safe Server Action contracts and cache primitives for Next.js 15+",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -15,6 +17,15 @@
       "require": "./dist/index.cjs"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yabafre/zapaction.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/yabafre/zapaction/issues"
+  },
+  "homepage": "https://github.com/yabafre/zapaction/tree/main/packages/core#readme",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "typecheck": "tsc -p tsconfig.json --noEmit",

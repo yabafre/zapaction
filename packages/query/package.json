@@ -1,6 +1,8 @@
 {
   "name": "@zapaction/query",
   "version": "0.1.0",
+  "description": "React Query integration for ZapAction with tag-driven invalidation",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -15,6 +17,15 @@
       "require": "./dist/index.cjs"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yabafre/zapaction.git",
+    "directory": "packages/query"
+  },
+  "bugs": {
+    "url": "https://github.com/yabafre/zapaction/issues"
+  },
+  "homepage": "https://github.com/yabafre/zapaction/tree/main/packages/query#readme",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
