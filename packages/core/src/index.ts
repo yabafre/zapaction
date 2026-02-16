@@ -3,8 +3,10 @@ export {
   type DefineActionOptions,
   type DefinedAction,
   type ActionResult,
+  type BeforeActionArgs,
+  type AfterActionArgs,
 } from "./defineAction";
-export { setActionContext } from "./context";
+export { setActionContext, __resetActionContextForTests } from "./context";
 export {
   createQueryKeys,
   createFeatureKeys,
@@ -12,3 +14,10 @@ export {
   type QueryKey,
 } from "./queryKeys";
 export { revalidateTags } from "./revalidateTags";
+export {
+  configureLogger,
+  type ActionLogEvent,
+  type ActionLogPhase,
+  type ActionLogLevel,
+  type LoggerOptions,
+} from "./logger";

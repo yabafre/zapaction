@@ -1,5 +1,5 @@
 import { createQueryKeys } from "@zapaction/core";
 
-export const usersKeys = createQueryKeys({
-  all: () => ["users"] as const,
+export const appKeys = createQueryKeys({
+  todos: () => ["todos"] as const,
 });

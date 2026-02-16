@@ -1,6 +1,6 @@
 {
   "name": "@zapaction/react",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Minimal React hooks for ZapAction Server Actions",
   "license": "MIT",
   "type": "module",
@@ -29,7 +29,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run"
   },
   "dependencies": {
     "@zapaction/core": "workspace:*"

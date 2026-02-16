@@ -26,22 +26,22 @@ bun add @zapaction/core @zapaction/react @zapaction/query zod
 ## 10-line Example
 
 ```ts
-const usersKeys = createFeatureKeys("users", {
+const todoKeys = createFeatureKeys("todos", {
   list: () => [],
 });
 
-const getUsers = defineAction({
+const listTodos = defineAction({
   input: z.object({}),
-  output: z.array(z.object({ id: z.string(), name: z.string() })),
-  tags: ["users"],
-  handler: async () => db.user.findMany(),
+  output: z.array(z.object({ id: z.string(), title: z.string() })),
+  tags: ["todos"],
+  handler: async () => db.todo.findMany(),
 });
 ```
 
 ```tsx
-const users = useActionQuery(getUsers, {
+const { data: todos } = useActionQuery(listTodos, {
   input: {},
-  queryKey: usersKeys.list(),
+  queryKey: todoKeys.list(),
   readPolicy: "read-only",
 });
 ```

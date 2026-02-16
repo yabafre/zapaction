@@ -1,19 +1,35 @@
-const config = {
+const themeConfig = {
+  darkMode: true,
   docsRepositoryBase: "https://github.com/yabafre/zapaction/tree/main/apps/docs",
-  editLink: "Edit this page on GitHub ->",
+  editLink: "Suggest an edit",
   feedback: {
-    content: "Question? Give feedback ->",
-    labels: "feedback",
+    content: "Question? Give feedback",
+    labels: "docs-feedback",
   },
-  navigation: true,
+  navigation: {
+    next: true,
+    prev: true,
+  },
   sidebar: {
+    autoCollapse: true,
     defaultMenuCollapseLevel: 1,
+    defaultOpen: true,
     toggleButton: true,
   },
+  i18n: [
+    { locale: "en", name: "English" },
+    { locale: "fr", name: "Francais" },
+  ],
   toc: {
-    backToTop: "Back to top",
     title: "On this page",
+    backToTop: "Back to top",
+    float: true,
+  },
+  themeSwitch: {
+    dark: "Dark",
+    light: "Light",
+    system: "System",
   },
 };
 
-export default config;
+export default themeConfig;

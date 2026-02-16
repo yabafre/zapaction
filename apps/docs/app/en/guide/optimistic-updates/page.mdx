@@ -1,0 +1,98 @@
+# Optimistic Updates
+
+Use TanStack Query's `onMutate` with `useActionMutation` for instant UI feedback.
+
+## Toggle a todo (optimistic)
+
+```tsx
+import { useQueryClient } from "@tanstack/react-query";
+import { useActionMutation, useActionQuery } from "@zapaction/query";
+import { toggleTodo, listTodos } from "../app/actions";
+import { appKeys } from "../app/query-keys";
+
+function TodoList() {
+  const queryClient = useQueryClient();
+
+  const { data: todos = [] } = useActionQuery(listTodos, {
+    input: {},
+    queryKey: appKeys.todos(),
+    readPolicy: "read-only",
+  });
+
+  const mutation = useActionMutation(toggleTodo, {
+    onMutate: async (input) => {
+      // 1. Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: appKeys.todos() });
+
+      // 2. Snapshot current data
+      const previous = queryClient.getQueryData(appKeys.todos());
+
+      // 3. Optimistically update
+      queryClient.setQueryData(appKeys.todos(), (old: typeof todos) =>
+        old.map((t) => (t.id === input.id ? { ...t, done: !t.done } : t)),
+      );
+
+      return { previous };
+    },
+    onError: (_err, _input, context) => {
+      // 4. Rollback on error
+      if (context?.previous) {
+        queryClient.setQueryData(appKeys.todos(), context.previous);
+      }
+    },
+  });
+
+  return (
+    <ul>
+      {todos.map((todo) => (
+        <li key={todo.id} onClick={() => mutation.mutate({ id: todo.id })}>
+          {todo.done ? "✓" : "○"} {todo.title}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## How it works
+
+```
+User clicks "toggle"
+  ↓
+onMutate fires → UI updates instantly (optimistic)
+  ↓
+Server action runs (toggleTodo)
+  ↓ success                        ↓ error
+Tag invalidation refetches          onError rolls back to snapshot
+with real server data
+```
+
+## Add a todo (optimistic)
+
+```tsx
+const mutation = useActionMutation(createTodo, {
+  onMutate: async (input) => {
+    await queryClient.cancelQueries({ queryKey: appKeys.todos() });
+    const previous = queryClient.getQueryData(appKeys.todos());
+
+    queryClient.setQueryData(appKeys.todos(), (old: Todo[]) => [
+      { id: `temp-${Date.now()}`, title: input.title, done: false },
+      ...old,
+    ]);
+
+    return { previous };
+  },
+  onError: (_err, _input, context) => {
+    if (context?.previous) {
+      queryClient.setQueryData(appKeys.todos(), context.previous);
+    }
+  },
+});
+```
+
+## Key points
+
+- Always cancel outgoing queries before optimistic update
+- Always snapshot previous data for rollback
+- After success, tag invalidation still fires — server data replaces optimistic data
+- The `onMutate` context is available in both `onError` and `onSettled`

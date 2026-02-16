@@ -1,0 +1,84 @@
+# ActionErrorBoundary
+
+Error boundary React conçu pour les erreurs de server actions.
+
+```tsx
+import { ActionErrorBoundary, useActionErrorReset } from "@zapaction/react";
+```
+
+## ActionErrorBoundary
+
+### Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `children` | `ReactNode` | Contenu à rendre |
+| `fallback` | `ReactNode \| ((props: { error: unknown; reset: () => void }) => ReactNode)` | UI d'erreur |
+| `onError` | `(error: unknown) => void` | Callback d'erreur optionnel |
+
+### Utilisation avec ReactNode
+
+```tsx
+<ActionErrorBoundary fallback={<p>Une erreur est survenue</p>}>
+  <MyComponent />
+</ActionErrorBoundary>
+```
+
+### Utilisation avec fonction de rendu
+
+```tsx
+<ActionErrorBoundary
+  fallback={({ error, reset }) => (
+    <div>
+      <p>Erreur : {String(error)}</p>
+      <button onClick={reset}>Réessayer</button>
+    </div>
+  )}
+>
+  <MyComponent />
+</ActionErrorBoundary>
+```
+
+### Avec callback onError
+
+```tsx
+<ActionErrorBoundary
+  fallback={<p>Erreur survenue</p>}
+  onError={(error) => {
+    reportToSentry(error);
+  }}
+>
+  <MyComponent />
+</ActionErrorBoundary>
+```
+
+## useActionErrorReset
+
+Hook pour accéder à l'état de l'error boundary depuis le fallback.
+
+```ts
+function useActionErrorReset(): { error: unknown; reset: () => void }
+```
+
+Doit être utilisé à l'intérieur d'un fallback `ActionErrorBoundary`. Lève une erreur si utilisé en dehors.
+
+### Exemple
+
+```tsx
+function ErrorFallback() {
+  const { error, reset } = useActionErrorReset();
+
+  return (
+    <div>
+      <h2>Action échouée</h2>
+      <pre>{String(error)}</pre>
+      <button onClick={reset}>Réessayer</button>
+    </div>
+  );
+}
+
+// Utilisation
+<ActionErrorBoundary fallback={<ErrorFallback />}>
+  <MyComponent />
+</ActionErrorBoundary>
+```

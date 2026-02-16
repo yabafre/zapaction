@@ -1,38 +1,88 @@
-# Module Products + Cart
+# Module multi-feature
 
-```txt
+Quand votre app grandit, organisez les actions par feature avec `createFeatureKeys` et `createFeatureTags`.
+
+## Structure
+
+```txt filename="features"
 features/
-  products/
-    _actions/
-    _queries/
-    _hooks/
-    _components/
-  cart/
-    _actions/
-    _queries/
-    _hooks/
-    _components/
+  todos/
+    actions.ts
+    keys.ts
+    hooks.ts
+  projects/
+    actions.ts
+    keys.ts
+    hooks.ts
 ```
 
-```ts
-export const productsKeys = createFeatureKeys("products", {
+## Feature keys et tags
+
+```ts filename="features/todos/keys.ts"
+// features/todos/keys.ts
+import { createFeatureKeys, createFeatureTags } from "@zapaction/core";
+
+export const todoKeys = createFeatureKeys("todos", {
   list: () => [],
   detail: (id: string) => [id],
 });
 
-export const cartKeys = createFeatureKeys("cart", {
-  active: (userId: string) => [userId],
-});
-
-export const productsTags = createFeatureTags("products", {
+export const todoTags = createFeatureTags("todos", {
   list: () => [],
   detail: (id: string) => [id],
 });
 
-export const addToCart = defineAction({
-  input: addToCartSchema,
-  output: cartItemSchema,
-  tags: [productsTags.list(), ["cart"]],
-  handler: async ({ input }) => db.cartItem.create({ data: input }),
+// todoKeys.list()   → ["todos", "list"]
+// todoTags.list()   → ["todos", "list"]
+// todoKeys.detail("42") → ["todos", "detail", "42"]
+```
+
+## Actions
+
+```ts filename="features/todos/actions.ts"
+// features/todos/actions.ts
+export const listTodos = defineAction({
+  name: "listTodos",
+  input: z.object({}),
+  output: z.array(todoSchema),
+  handler: async () => db.todo.findMany(),
+});
+
+export const createTodo = defineAction({
+  name: "createTodo",
+  input: z.object({ title: z.string().min(1) }),
+  output: todoSchema,
+  tags: ["todos"],
+  handler: async ({ input }) =>
+    db.todo.create({ data: { ...input, done: false } }),
 });
 ```
+
+## Tag registry (client)
+
+```ts filename="app/providers.tsx"
+setTagRegistry({
+  todos: [todoKeys.list()],
+  projects: [projectKeys.list()],
+});
+```
+
+## Invalidation cross-feature
+
+Quand un todo appartient à un projet, invalidez les deux features :
+
+```ts filename="features/todos/actions.ts"
+export const createTodo = defineAction({
+  name: "createTodo",
+  input: z.object({
+    title: z.string().min(1),
+    projectId: z.string(),
+  }),
+  output: todoSchema,
+  tags: ["todos", "projects"],
+  handler: async ({ input }) =>
+    db.todo.create({ data: input }),
+});
+```
+
+Les queries `todos` et `projects` seront invalidées quand cette action réussit.

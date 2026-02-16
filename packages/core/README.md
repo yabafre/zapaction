@@ -17,18 +17,29 @@ npm install @zapaction/core zod
 - `createFeatureKeys`
 - `createFeatureTags`
 - `revalidateTags`
+- `configureLogger`
 
 ## Feature-first helpers
 
 ```ts
-const productsKeys = createFeatureKeys("products", {
+const todoKeys = createFeatureKeys("todos", {
   list: () => [],
   detail: (id: string) => [id],
 });
 
-const productsTags = createFeatureTags("products", {
+const todoTags = createFeatureTags("todos", {
   list: () => [],
   detail: (id: string) => [id],
+});
+```
+
+## Logging
+
+```ts
+configureLogger({
+  enabled: true,
+  level: "info",
+  onLog: (event) => console.log(event),
 });
 ```
 

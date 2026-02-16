@@ -1,0 +1,87 @@
+# API Middleware
+
+Hooks middleware pour `defineAction`.
+
+## beforeAction
+
+<ApiSignature
+  name="beforeAction"
+  description="S'exécute avant le handler de l'action."
+  params={[
+    {
+      name: "args",
+      type: "BeforeActionArgs<TInput, TContext>",
+      required: true,
+      description: "Input parsé et contexte résolu",
+    },
+  ]}
+  returnType="void | Promise<void>"
+/>
+
+### BeforeActionArgs
+
+| Propriété | Type | Description |
+|-----------|------|-------------|
+| `input` | `TInput` | Input parsé et validé |
+| `ctx` | `TContext` | Contexte d'action résolu |
+
+- S'exécute après le parsing de l'input et la résolution du contexte
+- Throw pour annuler — le handler ne sera pas exécuté
+- Ne peut pas modifier l'input
+- Supporte l'async
+
+## afterAction
+
+<ApiSignature
+  name="afterAction"
+  description="S'exécute après le handler et avant la validation output."
+  params={[
+    {
+      name: "args",
+      type: "AfterActionArgs<TInput, TOutput, TContext>",
+      required: true,
+      description: "Input parsé, contexte résolu et résultat du handler",
+    },
+  ]}
+  returnType="TOutput | void | Promise<TOutput | void>"
+/>
+
+### AfterActionArgs
+
+| Propriété | Type | Description |
+|-----------|------|-------------|
+| `input` | `TInput` | Input parsé et validé |
+| `ctx` | `TContext` | Contexte d'action résolu |
+| `result` | `TOutput` | Valeur de retour du handler |
+
+- S'exécute après le handler, avant la validation de l'output
+- Retourner une valeur pour remplacer le résultat
+- Retourner `undefined`/void pour conserver le résultat original
+- La valeur retournée passe par la validation du schéma output
+- Supporte l'async
+
+## Ordre du pipeline
+
+<PipelineDiagram />
+
+## Exemple
+
+```ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const createUser = defineAction({
+  input: z.object({ name: z.string() }),
+  output: z.object({ id: z.string(), name: z.string() }),
+  tags: ["users"],
+  beforeAction: async ({ ctx }) => {
+    if (!ctx.session) throw new Error("Non autorisé");
+  },
+  afterAction: ({ result }) => {
+    console.log("Utilisateur créé:", result.id);
+  },
+  handler: async ({ input }) => {
+    return db.user.create({ data: input });
+  },
+});
+```

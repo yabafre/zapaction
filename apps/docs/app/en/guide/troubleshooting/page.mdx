@@ -1,0 +1,108 @@
+# Troubleshooting
+
+Common issues and solutions when using ZapAction.
+
+## "Action context factory is not configured"
+
+**Cause**: `setActionContext()` was not called before an action executed.
+
+**Fix**: Call `setActionContext()` in your server bootstrap file and import it in your root layout:
+
+```ts
+// bootstrap.server.ts
+import { setActionContext } from "@zapaction/core";
+
+setActionContext(async () => {
+  return { userId: "..." };
+});
+```
+
+```tsx
+// app/layout.tsx
+import "./bootstrap.server";
+```
+
+## "setActionContext must be called on the server"
+
+**Cause**: `setActionContext` is being imported or called in a client component.
+
+**Fix**: Ensure your bootstrap file only runs on the server. Do not add `"use client"` to it.
+
+## Zod validation errors
+
+**Cause**: Input or output does not match the Zod schema.
+
+**Fix**: Check the error's `issues` array for details:
+
+```ts
+try {
+  await action(input);
+} catch (error) {
+  if (error.name === "ZodError") {
+    console.log(error.issues);
+  }
+}
+```
+
+## Cache not invalidating after mutation
+
+**Cause**: Tag registry is not configured, or tags do not match.
+
+**Fix**:
+1. Ensure `setTagRegistry()` is called in your client bootstrap
+2. Verify the tag names match between `defineAction({ tags: ["users"] })` and the registry
+3. Import client bootstrap in your providers file
+
+```ts
+// bootstrap.client.ts
+import { setTagRegistry } from "@zapaction/query";
+import { usersKeys } from "./query-keys";
+
+setTagRegistry({
+  users: [usersKeys.all()],
+});
+```
+
+## "useActionErrorReset must be used within ActionErrorBoundary"
+
+**Cause**: The `useActionErrorReset` hook is used outside of an `ActionErrorBoundary` fallback.
+
+**Fix**: Only call this hook inside the fallback render function:
+
+```tsx
+<ActionErrorBoundary
+  fallback={({ error, reset }) => (
+    <div>
+      <p>Error: {String(error)}</p>
+      <button onClick={reset}>Retry</button>
+    </div>
+  )}
+>
+  <MyComponent />
+</ActionErrorBoundary>
+```
+
+## TypeScript errors with context type
+
+**Cause**: Context type is not inferred from `setActionContext`.
+
+**Fix**: Define your context type explicitly:
+
+```ts
+type AppContext = {
+  userId: string;
+  session: Session | null;
+};
+
+// Use it in defineAction
+defineAction<InputType, OutputType, AppContext>({ ... });
+```
+
+## Actions work in dev but fail in production
+
+**Cause**: Usually a missing `"use server"` directive or server-only import leaked to the client.
+
+**Fix**:
+1. Ensure action files have `"use server"` at the top
+2. Check that server-only code (db, auth) is not imported in client components
+3. Verify bootstrap.server.ts is imported in a server component (layout.tsx)

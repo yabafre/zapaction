@@ -1,16 +1,19 @@
-# Next.js Example
+# Next.js Real-World Example
 
-This example demonstrates the ZapAction MVP flow:
+This workspace is a real Next.js App Router application that demonstrates ZapAction in end-to-end flow:
 
-- Define actions with `defineAction`
-- Execute writes with `useActionMutation`
-- Read with `useActionQuery` (read-only policy)
-- Keep cache coherence with shared tag `users`
+- `@zapaction/core` for typed server actions
+- `beforeAction` middleware guards using request context
+- `tags` for server-side cache revalidation
+- `@zapaction/query` (`useActionQuery` + `useActionMutation`) for client cache sync
+- `@zapaction/react` (`useAction` + `ActionErrorBoundary`) for imperative actions and UI safety
 
-Warning:
+## What the app does
 
-- This example stores users in module memory for demonstration only.
-- It is not a production persistence strategy for serverless environments.
+- Reads a viewer role (`viewer`/`admin`) from a cookie via `next/headers`
+- Exposes CRUD actions on an in-memory users store
+- Restricts role updates and delete operations to `admin`
+- Uses shared tag invalidation so mutations refresh the users query automatically
 
 ## Run
 
@@ -18,3 +21,11 @@ Warning:
 pnpm install
 pnpm --filter @zapaction/example-next-app dev
 ```
+
+Open <http://localhost:3000>.
+
+## File map
+
+- `app/actions.ts`: server actions, middleware, context, schemas
+- `app/providers.tsx`: `QueryClientProvider` + tag registry
+- `components/users-panel.tsx`: full client flow (query, mutation, useAction, error boundary)

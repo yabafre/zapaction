@@ -1,30 +1,136 @@
-# Project Setup (Structure recommandee)
+import { Tabs } from "nextra/components";
 
-Utilisez une structure feature-first des le debut.
+# Quick Start
 
-```txt
-src/
-  features/
-    users/
-      _actions/
-      _queries/
-      _hooks/
-      _components/
+Un flux ZapAction fonctionnel en 5 minutes.
+
+## 1. Installer les packages
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tabs.Tab>
+
+```bash
+npm install @zapaction/core @zapaction/react @zapaction/query zod
 ```
 
-## Flux d'appel
+  </Tabs.Tab>
+  <Tabs.Tab>
 
-```txt
-RSC Page
-  -> Client Component
-    -> useUsers()
-      -> useActionQuery() / useActionMutation()
-        -> Server Action
+```bash
+pnpm add @zapaction/core @zapaction/react @zapaction/query zod
 ```
 
-## Regle pratique
+  </Tabs.Tab>
+  <Tabs.Tab>
 
-- Les composants n'appellent jamais les actions directement.
-- Les composants appellent des hooks.
-- Les hooks appellent les hooks ZapAction.
-- Les server actions restent server-only.
+```bash
+yarn add @zapaction/core @zapaction/react @zapaction/query zod
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+```bash
+bun add @zapaction/core @zapaction/react @zapaction/query zod
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+## 2. Définir votre première action
+
+```ts
+// app/actions.ts
+"use server";
+
+import { defineAction, setActionContext } from "@zapaction/core";
+import { z } from "zod";
+
+const todoSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  done: z.boolean(),
+});
+
+// Le contexte est disponible dans chaque action via `ctx`
+setActionContext(async () => ({
+  userId: "user-1",
+}));
+
+export const listTodos = defineAction({
+  name: "listTodos",
+  input: z.object({}),
+  output: z.array(todoSchema),
+  handler: async () => db.todo.findMany(),
+});
+
+export const createTodo = defineAction({
+  name: "createTodo",
+  input: z.object({ title: z.string().min(1) }),
+  output: todoSchema,
+  tags: ["todos"],
+  handler: async ({ input }) =>
+    db.todo.create({ data: { ...input, done: false } }),
+});
+```
+
+## 3. Connecter le tag registry côté client
+
+```tsx
+// app/providers.tsx
+"use client";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { setTagRegistry } from "@zapaction/query";
+import { useState, type ReactNode } from "react";
+
+setTagRegistry({
+  todos: [["todos"]],
+});
+
+export function Providers({ children }: { children: ReactNode }) {
+  const [client] = useState(() => new QueryClient());
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+}
+```
+
+## 4. Lire + écrire depuis un composant
+
+```tsx
+// components/todo-list.tsx
+"use client";
+
+import { useActionQuery, useActionMutation } from "@zapaction/query";
+import { listTodos, createTodo } from "../app/actions";
+
+export function TodoList() {
+  const { data: todos = [] } = useActionQuery(listTodos, {
+    input: {},
+    queryKey: ["todos"],
+    readPolicy: "read-only",
+  });
+
+  const createMutation = useActionMutation(createTodo);
+
+  return (
+    <div>
+      <button onClick={() => createMutation.mutateAsync({ title: "Nouvelle tâche" })}>
+        Ajouter
+      </button>
+      <ul>
+        {todos.map((t) => (
+          <li key={t.id}>{t.done ? "✓" : "○"} {t.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+C'est tout. Quand `createTodo` réussit, le tag `"todos"` déclenche l'invalidation automatique de la query.
+
+## 5. Étapes suivantes
+
+- Voir l'[Exemple CRUD Complet](/fr/examples/full-crud) pour une app exécutable
+- Découvrir la [Gestion d'erreurs](/fr/guide/error-handling) avec `ActionErrorBoundary`
+- Ajouter des [Middleware](/fr/guide/middleware) avec `beforeAction`

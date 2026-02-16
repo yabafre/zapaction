@@ -19,6 +19,8 @@
   "include": [
     "next-env.d.ts",
     "app",
+    "components",
+    "middleware.ts",
     ".next/types/**/*.ts",
     "theme.config.tsx",
     "mdx-components.tsx"

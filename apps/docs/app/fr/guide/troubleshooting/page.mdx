@@ -1,0 +1,108 @@
+# Dépannage
+
+Problèmes courants et solutions lors de l'utilisation de ZapAction.
+
+## "Action context factory is not configured"
+
+**Cause** : `setActionContext()` n'a pas été appelé avant l'exécution d'une action.
+
+**Solution** : Appelez `setActionContext()` dans votre fichier de bootstrap serveur et importez-le dans votre layout racine :
+
+```ts
+// bootstrap.server.ts
+import { setActionContext } from "@zapaction/core";
+
+setActionContext(async () => {
+  return { userId: "..." };
+});
+```
+
+```tsx
+// app/layout.tsx
+import "./bootstrap.server";
+```
+
+## "setActionContext must be called on the server"
+
+**Cause** : `setActionContext` est importé ou appelé dans un composant client.
+
+**Solution** : Assurez-vous que votre fichier bootstrap s'exécute uniquement côté serveur. N'ajoutez pas `"use client"`.
+
+## Erreurs de validation Zod
+
+**Cause** : L'input ou l'output ne correspond pas au schéma Zod.
+
+**Solution** : Vérifiez le tableau `issues` de l'erreur :
+
+```ts
+try {
+  await action(input);
+} catch (error) {
+  if (error.name === "ZodError") {
+    console.log(error.issues);
+  }
+}
+```
+
+## Le cache ne s'invalide pas après mutation
+
+**Cause** : Le tag registry n'est pas configuré, ou les tags ne correspondent pas.
+
+**Solution** :
+1. Assurez-vous que `setTagRegistry()` est appelé dans votre bootstrap client
+2. Vérifiez que les noms de tags correspondent entre `defineAction({ tags: ["users"] })` et le registry
+3. Importez le bootstrap client dans votre fichier providers
+
+```ts
+// bootstrap.client.ts
+import { setTagRegistry } from "@zapaction/query";
+import { usersKeys } from "./query-keys";
+
+setTagRegistry({
+  users: [usersKeys.all()],
+});
+```
+
+## "useActionErrorReset must be used within ActionErrorBoundary"
+
+**Cause** : Le hook `useActionErrorReset` est utilisé en dehors d'un fallback `ActionErrorBoundary`.
+
+**Solution** : N'appelez ce hook qu'à l'intérieur de la fonction de rendu fallback :
+
+```tsx
+<ActionErrorBoundary
+  fallback={({ error, reset }) => (
+    <div>
+      <p>Erreur : {String(error)}</p>
+      <button onClick={reset}>Réessayer</button>
+    </div>
+  )}
+>
+  <MyComponent />
+</ActionErrorBoundary>
+```
+
+## Erreurs TypeScript avec le type de contexte
+
+**Cause** : Le type du contexte n'est pas inféré depuis `setActionContext`.
+
+**Solution** : Définissez votre type de contexte explicitement :
+
+```ts
+type AppContext = {
+  userId: string;
+  session: Session | null;
+};
+
+// Utilisez-le dans defineAction
+defineAction<InputType, OutputType, AppContext>({ ... });
+```
+
+## Les actions fonctionnent en dev mais échouent en production
+
+**Cause** : Généralement une directive `"use server"` manquante ou un import serveur qui fuite côté client.
+
+**Solution** :
+1. Assurez-vous que les fichiers d'actions ont `"use server"` en haut
+2. Vérifiez que le code serveur (db, auth) n'est pas importé dans les composants client
+3. Vérifiez que bootstrap.server.ts est importé dans un composant serveur (layout.tsx)

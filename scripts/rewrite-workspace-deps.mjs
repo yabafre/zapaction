@@ -92,13 +92,13 @@ async function main() {
         continue;
       }
 
-      console.log(`\\n${result.packageName}`);
+      console.log(`\n${result.packageName}`);
       for (const change of result.changes) {
         console.log(`  - ${change}`);
       }
     }
 
-    console.log("\\nDry run complete. Source manifests were not modified.");
+    console.log("\nDry run complete. Source manifests were not modified.");
     return;
   }
 
@@ -119,7 +119,7 @@ async function main() {
     }
   }
 
-  console.log(`\\nPrepared rewritten manifests in ${outputDir}`);
+  console.log(`\nPrepared rewritten manifests in ${outputDir}`);
   console.log("Source manifests were not modified.");
 }
 

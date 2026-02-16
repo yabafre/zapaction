@@ -1,25 +1,34 @@
 # Smoke Test
 
-## Scenario 1: Unified cache tags
+## Scenario 1: Role guard works
 
 1. Start the app.
-2. Open the page and note the user list.
-3. Create a user using the input + button.
-4. Verify the list refreshes after mutation.
+2. Keep default role `viewer`.
+3. Try `Set admin` or `Delete` on any user.
 
 Expected:
 
-- Server action revalidates `users` tag.
-- Client invalidates mapped query key from `setTagRegistry`.
-- UI shows the new user without manual cache wiring.
+- Buttons are disabled for `viewer` role.
+- No mutation runs.
 
-## Scenario 2: No tags means no invalidation
+## Scenario 2: Role switch updates context
 
-1. Create a temporary action with no `tags` metadata.
-2. Execute via mutation.
-3. Inspect query cache behavior.
+1. Click `Switch to admin`.
+2. Verify role label becomes `admin`.
+3. Try `Set admin/viewer` and `Delete` on users.
 
 Expected:
 
-- No server revalidation call.
-- No client `invalidateQueries` call.
+- `setViewerRole` action updates the cookie-backed session.
+- Viewer and users queries are refreshed.
+
+## Scenario 3: Unified cache tags
+
+1. Create a user from the form.
+2. Verify the list updates without manual query invalidation code.
+
+Expected:
+
+- Mutation actions (`create`, `updateRole`, `delete`) carry `tags: ["users"]`.
+- Client query invalidation is resolved via `setTagRegistry`.
+- User list refreshes after each successful mutation.

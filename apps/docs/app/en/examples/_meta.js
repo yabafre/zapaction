@@ -1,5 +1,5 @@
 export default {
   index: "Overview",
-  "users-crud": "Users CRUD",
-  "products-cart-module": "Products + Cart Module",
+  "full-crud": "Full CRUD",
+  "products-cart-module": "Multi-feature Module",
 };

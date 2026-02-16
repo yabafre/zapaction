@@ -1,17 +1,92 @@
 # Error Handling
 
-ZapAction keeps error passthrough semantics.
+ZapAction keeps error passthrough semantics — errors are thrown, never wrapped in envelopes.
 
-- Zod validation errors are thrown.
-- Handler errors are thrown.
-- No envelope conversion at runtime.
+## Where errors can occur
 
-## Client pattern
+| Stage | What throws |
+|-------|-------------|
+| Input parsing | Zod validation error |
+| `beforeAction` | Your guard logic (e.g. auth check) |
+| `handler` | Your business logic |
+| `afterAction` | Post-processing logic |
+| Output parsing | Zod validation error |
+
+All errors propagate naturally — catch them in your client code.
+
+## Try/catch pattern
 
 ```tsx
-try {
-  await mutation.mutateAsync(input);
-} catch (error) {
-  // map to UI-safe messaging here
+const mutation = useActionMutation(createTodo);
+
+async function handleSubmit() {
+  try {
+    await mutation.mutateAsync({ title: "Buy milk" });
+  } catch (error) {
+    // Handle or display the error
+    console.error("Action failed:", error);
+  }
 }
 ```
+
+## ActionErrorBoundary
+
+Wrap a component tree to catch any error (including from queries and mutations):
+
+```tsx
+import { ActionErrorBoundary } from "@zapaction/react";
+
+<ActionErrorBoundary
+  fallback={({ error, reset }) => (
+    <div>
+      <p>Something went wrong: {String(error)}</p>
+      <button onClick={reset}>Try again</button>
+    </div>
+  )}
+  onError={(error) => reportToSentry(error)}
+>
+  <TodoList />
+</ActionErrorBoundary>
+```
+
+### With `useActionErrorReset`
+
+For more complex fallback components, extract the error and reset into a hook:
+
+```tsx
+import { ActionErrorBoundary, useActionErrorReset } from "@zapaction/react";
+
+function ErrorFallback() {
+  const { error, reset } = useActionErrorReset();
+
+  return (
+    <div>
+      <h2>Something went wrong</h2>
+      <pre>{String(error)}</pre>
+      <button onClick={reset}>Retry</button>
+    </div>
+  );
+}
+
+<ActionErrorBoundary fallback={<ErrorFallback />}>
+  <TodoList />
+</ActionErrorBoundary>
+```
+
+## Example from the real app
+
+In the [example app](/en/examples/full-crud), the `TodoPanel` component wraps its content in an error boundary:
+
+```tsx
+export function TodoPanel() {
+  return (
+    <ActionErrorBoundary fallback={<ErrorFallback />}>
+      <TodoPanelContent />
+    </ActionErrorBoundary>
+  );
+}
+```
+
+If `useActionQuery` throws (e.g. network failure), the boundary catches it and shows the retry UI.
+
+See [ActionErrorBoundary API](/en/api-reference/action-error-boundary) for full reference.

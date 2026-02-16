@@ -1,0 +1,125 @@
+# Full CRUD Example
+
+This page is backed by a real Next.js App Router app in the repository:
+
+```txt filename="examples/next-app"
+examples/next-app/
+```
+
+You can run it locally and inspect every file.
+
+## Run the example
+
+```bash
+pnpm install
+pnpm --filter @zapaction/example-next-app dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000).
+
+## Project structure
+
+| File | Role |
+|------|------|
+| `app/actions.ts` | Server actions (`listTodos`, `createTodo`, `toggleTodo`, `deleteTodo`) |
+| `app/query-keys.ts` | Centralized query keys |
+| `app/providers.tsx` | React Query provider + tag registry |
+| `components/todo-panel.tsx` | Full client flow: query + mutations + error boundary |
+
+## Server-side actions
+
+```ts filename="examples/next-app/app/actions.ts"
+// app/actions.ts (simplified)
+"use server";
+
+import { defineAction, setActionContext } from "@zapaction/core";
+import { z } from "zod";
+
+setActionContext(async () => ({
+  userId: "user-1",
+}));
+
+export const listTodos = defineAction({
+  name: "listTodos",
+  input: z.object({}),
+  output: z.array(todoSchema),
+  handler: async () => [...todos],
+});
+
+export const createTodo = defineAction({
+  name: "createTodo",
+  input: z.object({ title: z.string().min(1) }),
+  output: todoSchema,
+  tags: ["todos"],
+  handler: async ({ input }) => {
+    const todo = { id: String(nextId++), title: input.title, done: false };
+    todos.push(todo);
+    return todo;
+  },
+});
+
+export const toggleTodo = defineAction({
+  name: "toggleTodo",
+  input: z.object({ id: z.string() }),
+  output: todoSchema,
+  tags: ["todos"],
+  beforeAction: ({ input }) => {
+    if (!todos.some((t) => t.id === input.id)) throw new Error("Todo not found");
+  },
+  handler: async ({ input }) => {
+    const todo = todos.find((t) => t.id === input.id)!;
+    todo.done = !todo.done;
+    return { ...todo };
+  },
+});
+
+export const deleteTodo = defineAction({
+  name: "deleteTodo",
+  input: z.object({ id: z.string() }),
+  output: z.object({ deleted: z.boolean() }),
+  tags: ["todos"],
+  beforeAction: ({ input }) => {
+    if (!todos.some((t) => t.id === input.id)) throw new Error("Todo not found");
+  },
+  handler: async ({ input }) => {
+    todos.splice(todos.findIndex((t) => t.id === input.id), 1);
+    return { deleted: true };
+  },
+});
+```
+
+## Client-side usage
+
+```tsx filename="examples/next-app/components/todo-panel.tsx"
+// components/todo-panel.tsx (simplified)
+"use client";
+
+import { useActionMutation, useActionQuery } from "@zapaction/query";
+import { ActionErrorBoundary, useActionErrorReset } from "@zapaction/react";
+
+// Read all todos
+const { data: todos } = useActionQuery(listTodos, {
+  input: {},
+  queryKey: appKeys.todos(),
+  readPolicy: "read-only",
+});
+
+// Write mutations — tag invalidation refreshes the query automatically
+const createMutation = useActionMutation(createTodo);
+const toggleMutation = useActionMutation(toggleTodo);
+const deleteMutation = useActionMutation(deleteTodo);
+```
+
+## What this demonstrates
+
+| Feature | Where it's used |
+|---------|----------------|
+| `defineAction` with Zod schemas | All 4 actions in `actions.ts` |
+| `setActionContext` | Server bootstrap in `actions.ts` |
+| `beforeAction` middleware | `toggleTodo`, `deleteTodo` validation |
+| `tags` for cache invalidation | All write actions |
+| `useActionQuery` | Reading the todo list |
+| `useActionMutation` | Creating, toggling, deleting |
+| `ActionErrorBoundary` | Wrapping the todo panel |
+| `useActionErrorReset` | Error fallback with retry |
+| `setTagRegistry` | Client provider setup |

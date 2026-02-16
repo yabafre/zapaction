@@ -23,11 +23,11 @@ npm install @zapaction/query @zapaction/core @tanstack/react-query react
 - Use `useActionQuery` only for read operations.
 
 ```ts
-const usersKeys = createFeatureKeys("users", {
+const todoKeys = createFeatureKeys("todos", {
   list: () => [],
 });
 
 setTagRegistry({
-  users: [usersKeys.list()],
+  todos: [todoKeys.list()],
 });
 ```

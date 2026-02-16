@@ -1,28 +1,41 @@
-# Architecture Guide
+# Architecture
 
-## Regles de layering
-
-- Les composants n'appellent jamais les actions directement.
-- Les composants appellent des hooks de feature.
-- Les hooks de feature appellent les hooks ZapAction.
-- Les actions s'executent uniquement cote serveur.
-
-## Flux de reference
+Utilisez une structure feature-first dès le début.
 
 ```txt
-RSC -> Client Component -> Feature Hook -> ZapAction Hook -> Server Action
+src/
+  features/
+    users/
+      _actions/
+      _queries/
+      _hooks/
+      _components/
 ```
 
-## Anti-pattern
+## Règles de layering
 
-```tsx
-// A eviter: le composant appelle l'action directement
-await createProduct({ name: "X" });
+- Les composants n'appellent pas directement les server actions
+- Les hooks feature appellent les hooks ZapAction (`useActionQuery`, `useActionMutation`, `useAction`)
+- Les actions restent server-only
+
+## Flux
+
+```txt
+RSC Page -> Client Component -> Feature Hook -> ZapAction Hook -> Server Action
 ```
 
-## Pattern recommande
+## Keys et tags dans la feature
 
-```tsx
-const mutation = useCreateProduct();
-await mutation.mutateAsync({ name: "X" });
+```ts
+export const usersKeys = createFeatureKeys("users", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
+
+export const usersTags = createFeatureTags("users", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
 ```
+
+Ce pattern garde l'ownership local et évite le chaos au niveau des routes.

@@ -1,28 +1,41 @@
-# Architecture Guide
+# Architecture
+
+Use a feature-first layout from the start.
+
+```txt
+src/
+  features/
+    users/
+      _actions/
+      _queries/
+      _hooks/
+      _components/
+```
 
 ## Layering rules
 
-- Components never call actions directly.
-- Components call feature hooks.
-- Feature hooks call ZapAction hooks.
-- Actions run only on the server.
+- Components do not call server actions directly
+- Feature hooks call ZapAction hooks (`useActionQuery`, `useActionMutation`, `useAction`)
+- Actions stay server-only
 
-## Reference flow
+## Flow
 
 ```txt
-RSC -> Client Component -> Feature Hook -> ZapAction Hook -> Server Action
+RSC Page -> Client Component -> Feature Hook -> ZapAction Hook -> Server Action
 ```
 
-## Anti-pattern
+## Keys and tags stay in the feature
 
-```tsx
-// Avoid: component calls action directly
-await createProduct({ name: "X" });
+```ts
+export const usersKeys = createFeatureKeys("users", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
+
+export const usersTags = createFeatureTags("users", {
+  list: () => [],
+  detail: (id: string) => [id],
+});
 ```
 
-## Preferred
-
-```tsx
-const mutation = useCreateProduct();
-await mutation.mutateAsync({ name: "X" });
-```
+This keeps ownership local and prevents route-level sprawl.

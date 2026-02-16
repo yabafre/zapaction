@@ -1,12 +1,8 @@
+import { assertServer } from "./assertServer";
+
 type ActionContextFactory = () => unknown | Promise<unknown>;
 
 let contextFactory: ActionContextFactory | undefined;
-
-function assertServer(apiName: string): void {
-  if (typeof window !== "undefined") {
-    throw new Error(`${apiName} must be called on the server.`);
-  }
-}
 
 export function setActionContext<TContext>(
   factory: () => Promise<TContext> | TContext,

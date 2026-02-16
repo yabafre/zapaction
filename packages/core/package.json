@@ -1,6 +1,6 @@
 {
   "name": "@zapaction/core",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Type-safe Server Action contracts and cache primitives for Next.js 15+",
   "license": "MIT",
   "type": "module",
@@ -36,7 +36,7 @@
   },
   "peerDependencies": {
     "next": ">=15",
-    "zod": ">=3"
+    "zod": ">=4"
   },
   "peerDependenciesMeta": {
     "next": {

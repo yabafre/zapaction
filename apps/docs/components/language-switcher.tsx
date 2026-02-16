@@ -29,7 +29,7 @@ export function LanguageSwitcher() {
   const activeLocale = getActiveLocale(pathname);
 
   return (
-    <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+    <div className="za-locale-switch">
       {LOCALES.map((locale) => {
         const href = withLocale(pathname, locale);
         const isActive = locale === activeLocale;
@@ -38,15 +38,11 @@ export function LanguageSwitcher() {
           <Link
             key={locale}
             href={href}
+            className="za-locale-pill"
+            data-active={isActive ? "true" : "false"}
             aria-current={isActive ? "page" : undefined}
-            style={{
-              fontSize: 12,
-              textTransform: "uppercase",
-              fontWeight: isActive ? 700 : 500,
-              opacity: isActive ? 1 : 0.65,
-            }}
           >
-            {locale}
+            {locale.toUpperCase()}
           </Link>
         );
       })}

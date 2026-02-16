@@ -1,0 +1,94 @@
+# Testing Patterns
+
+ZapAction actions are plain async functions, so test the contract directly with Vitest.
+
+## Test an action
+
+```ts filename="features/todos/actions.test.ts"
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { __resetActionContextForTests, setActionContext } from "@zapaction/core";
+import { createTodo } from "./actions";
+
+vi.mock("next/cache", () => ({
+  revalidateTag: vi.fn(),
+}));
+
+describe("createTodo", () => {
+  beforeEach(() => {
+    __resetActionContextForTests();
+    setActionContext(async () => ({ userId: "test-user" }));
+  });
+
+  it("creates a todo with valid input", async () => {
+    const result = await createTodo({ title: "Write tests" });
+    expect(result).toMatchObject({ title: "Write tests", done: false });
+    expect(result.id).toBeDefined();
+  });
+
+  it("rejects empty title", async () => {
+    await expect(createTodo({ title: "" })).rejects.toThrow();
+  });
+});
+```
+
+## Test hooks
+
+```ts filename="packages/react/src/useAction.test.ts"
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useAction } from "@zapaction/react";
+
+let stateMap: Map<number, unknown>;
+let stateIndex: number;
+
+vi.mock("react", () => ({
+  useState: (initial: unknown) => {
+    const idx = stateIndex++;
+    if (!stateMap.has(idx)) stateMap.set(idx, initial);
+    return [stateMap.get(idx), (next: unknown) => stateMap.set(idx, next)];
+  },
+  useCallback: (fn: Function) => fn,
+}));
+
+beforeEach(() => {
+  stateIndex = 0;
+  stateMap = new Map();
+});
+
+it("returns idle initial state", () => {
+  const action = async (input: { title: string }) => ({
+    id: "1",
+    title: input.title,
+    done: false,
+  });
+  const result = useAction(action);
+  expect(result.status).toBe("idle");
+});
+```
+
+## Test mutation invalidation
+
+```ts filename="packages/query/src/useActionMutation.test.ts"
+import { vi } from "vitest";
+import { useActionMutation } from "@zapaction/query";
+
+vi.mock("@tanstack/react-query", () => ({
+  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
+  useMutation: (opts: any) => ({
+    mutateAsync: async (input: unknown) => {
+      const data = await opts.mutationFn(input);
+      if (opts.onSuccess) await opts.onSuccess(data, input, undefined, undefined);
+      return data;
+    },
+  }),
+}));
+```
+
+## Live check
+
+<LiveTestResults locale="en" />
+
+Keep tests focused on observable behavior:
+
+- Mock external boundaries (`next/cache`, network, db).
+- Reset shared context in `beforeEach`.
+- Verify input/output contracts before internal implementation details.

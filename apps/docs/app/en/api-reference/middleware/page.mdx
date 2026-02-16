@@ -1,0 +1,87 @@
+# Middleware API
+
+Middleware hooks for `defineAction`.
+
+## beforeAction
+
+<ApiSignature
+  name="beforeAction"
+  description="Runs before the action handler."
+  params={[
+    {
+      name: "args",
+      type: "BeforeActionArgs<TInput, TContext>",
+      required: true,
+      description: "Parsed input and resolved context",
+    },
+  ]}
+  returnType="void | Promise<void>"
+/>
+
+### BeforeActionArgs
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `input` | `TInput` | Parsed and validated input |
+| `ctx` | `TContext` | Resolved action context |
+
+- Runs after input parsing and context resolution
+- Throw to abort — handler will not execute
+- Cannot modify input
+- Async supported
+
+## afterAction
+
+<ApiSignature
+  name="afterAction"
+  description="Runs after the handler and before output validation."
+  params={[
+    {
+      name: "args",
+      type: "AfterActionArgs<TInput, TOutput, TContext>",
+      required: true,
+      description: "Parsed input, resolved context, and handler result",
+    },
+  ]}
+  returnType="TOutput | void | Promise<TOutput | void>"
+/>
+
+### AfterActionArgs
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `input` | `TInput` | Parsed and validated input |
+| `ctx` | `TContext` | Resolved action context |
+| `result` | `TOutput` | Handler return value |
+
+- Runs after handler, before output validation
+- Return a value to replace the result
+- Return `undefined`/void to pass through original result
+- Returned value goes through output schema validation
+- Async supported
+
+## Pipeline order
+
+<PipelineDiagram />
+
+## Example
+
+```ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const createUser = defineAction({
+  input: z.object({ name: z.string() }),
+  output: z.object({ id: z.string(), name: z.string() }),
+  tags: ["users"],
+  beforeAction: async ({ ctx }) => {
+    if (!ctx.session) throw new Error("Unauthorized");
+  },
+  afterAction: ({ result }) => {
+    console.log("User created:", result.id);
+  },
+  handler: async ({ input }) => {
+    return db.user.create({ data: input });
+  },
+});
+```
