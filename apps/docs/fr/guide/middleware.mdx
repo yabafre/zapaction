@@ -1,0 +1,50 @@
+---
+title: "Middleware"
+description: "Utiliser beforeAction et afterAction pour politique, audit et transformation."
+---
+
+# Middleware
+
+## beforeAction
+
+```ts app/actions/todos.ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+type AppContext = { userId: string; role: "admin" | "user" };
+
+export const archiveTodo = defineAction<
+  { id: string },
+  { ok: true },
+  AppContext
+>({
+  input: z.object({ id: z.string() }),
+  output: z.object({ ok: z.literal(true) }),
+  beforeAction: async ({ ctx }) => {
+    if (ctx.role !== "admin") {
+      throw new Error("Forbidden");
+    }
+  },
+  handler: async () => ({ ok: true })
+});
+```
+
+## afterAction
+
+```ts app/actions/users.ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const getUser = defineAction({
+  input: z.object({ id: z.string() }),
+  output: z.object({ id: z.string(), email: z.string() }),
+  afterAction: async ({ result }) => ({
+    ...result,
+    email: result.email.toLowerCase()
+  }),
+  handler: async ({ input }) => ({
+    id: input.id,
+    email: "USER@EXAMPLE.COM"
+  })
+});
+```

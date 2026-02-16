@@ -1,0 +1,46 @@
+---
+title: "useActionQuery"
+description: "Read hook from @zapaction/query backed by TanStack useQuery."
+---
+
+# useActionQuery
+
+## Signature
+
+```ts packages/query/src/useActionQuery.ts
+export function useActionQuery<TInput, TOutput, TError = unknown, TData = TOutput>(
+  action: DefinedAction<TInput, TOutput>,
+  options: UseActionQueryOptions<TInput, TOutput, TError, TData>
+): UseQueryResult<TData, TError>
+```
+
+## Required options
+
+| Option | Type | Notes |
+| --- | --- | --- |
+| `input` | `TInput` | Input passed to the action |
+| `queryKey` | `QueryKey` | React Query cache key |
+| `readPolicy` | `"read-only"` | Required guardrail |
+
+## Behavior
+
+- Throws if `readPolicy` is not `"read-only"`.
+- Calls action inside `queryFn`.
+- Passes all other options to `useQuery`.
+
+## Example
+
+```tsx components/todo-list.tsx
+"use client";
+
+import { useActionQuery } from "@zapaction/query";
+
+import { listTodos } from "../app/actions";
+
+const query = useActionQuery(listTodos, {
+  input: {},
+  queryKey: ["todos"],
+  readPolicy: "read-only",
+  staleTime: 30_000
+});
+```

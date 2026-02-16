@@ -1,0 +1,51 @@
+---
+title: "Products Cart Module"
+description: "Feature-key and feature-tag strategy for modular ecommerce flows."
+---
+
+# Products Cart Module
+
+## Goal
+
+Keep cart reads/writes isolated by feature while preserving global invalidation behavior.
+
+## Define keys and tags by feature
+
+```ts features/cart/query-keys.ts
+import { createFeatureKeys, createFeatureTags } from "@zapaction/core";
+
+export const cartKeys = createFeatureKeys("cart", {
+  all: () => [],
+  byUser: (userId: string) => ["by-user", userId]
+});
+
+export const cartTags = createFeatureTags("cart", {
+  byUser: (userId: string) => ["by-user", userId]
+});
+```
+
+## Action contracts
+
+```ts features/cart/actions.ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const addToCart = defineAction({
+  input: z.object({ userId: z.string(), productId: z.string(), qty: z.number().min(1) }),
+  output: z.object({ ok: z.literal(true) }),
+  tags: ["cart"],
+  handler: async () => ({ ok: true })
+});
+```
+
+## Registry alignment
+
+```ts app/providers.tsx
+import { setTagRegistry } from "@zapaction/query";
+
+import { cartKeys } from "../features/cart/query-keys";
+
+setTagRegistry({
+  cart: [cartKeys.all()]
+});
+```

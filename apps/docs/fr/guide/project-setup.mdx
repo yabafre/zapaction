@@ -5,15 +5,31 @@ description: "Installer et initialiser ZapAction dans un projet Next.js App Rout
 
 # Project Setup
 
+## Prerequis
+
+- Un projet Next.js App Router.
+- Node.js 20+.
+- `pnpm`, `npm`, ou `yarn`.
+
 ## Installer les packages
 
-```bash filename="terminal"
+```bash terminal
 pnpm add @zapaction/core @zapaction/react @zapaction/query @tanstack/react-query zod
+```
+
+## Configurer le contexte serveur
+
+```ts app/bootstrap.server.ts
+import { setActionContext } from "@zapaction/core";
+
+setActionContext(async () => {
+  return { userId: "demo-user", roles: ["user"] };
+});
 ```
 
 ## Definir une server action
 
-```ts filename="app/actions.ts"
+```ts app/actions.ts
 "use server";
 
 import { defineAction } from "@zapaction/core";
@@ -28,17 +44,17 @@ export const createTodo = defineAction({
     done: z.boolean()
   }),
   tags: ["todos"],
-  handler: async ({ input }) => ({
+  handler: async ({ input, ctx }) => ({
     id: crypto.randomUUID(),
-    title: input.title,
+    title: `[${ctx.userId}] ${input.title}`,
     done: false
   })
 });
 ```
 
-## Configurer React Query + registry
+## Configurer Query client et registre de tags
 
-```tsx filename="app/providers.tsx"
+```tsx app/providers.tsx
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -53,4 +69,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
+```
+
+## Verification rapide
+
+```bash terminal
+pnpm test
+pnpm --filter @zapaction/example-next-app dev
 ```

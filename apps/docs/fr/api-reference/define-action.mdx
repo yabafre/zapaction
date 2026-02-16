@@ -1,36 +1,46 @@
 ---
 title: "defineAction"
-description: "API de contrat d'action type."
+description: "API de contrat d'action type de @zapaction/core."
 ---
 
 # defineAction
 
-`defineAction` valide l'input et l'output a l'execution tout en conservant le typage static.
+`defineAction` valide input/output a l'execution tout en conservant le typage TypeScript.
 
 ## Signature
 
-```ts filename="packages/core/src/defineAction.ts"
-defineAction({
-  name?: string,
-  input: ZodSchema,
-  output: ZodSchema,
-  tags?: readonly string[],
-  beforeAction?: (ctx) => void | Promise<void>,
-  afterAction?: (ctx) => void | Promise<void>,
-  handler: ({ input, context }) => Promise<Output>
-})
+```ts packages/core/src/defineAction.ts
+export function defineAction<TInput, TOutput, TContext = unknown>(
+  options: DefineActionOptions<TInput, TOutput, TContext>
+): DefinedAction<TInput, TOutput>
 ```
+
+## Options
+
+| Option | Type | Obligatoire | Notes |
+| --- | --- | --- | --- |
+| `input` | `ZodType<TInput>` | Oui | Validation runtime de l'input |
+| `output` | `ZodType<TOutput>` | Non | Validation runtime de l'output |
+| `name` | `string` | Non | Utilise par le logger |
+| `tags` | `readonly string[]` | Non | Passe a `revalidateTags` |
+| `beforeAction` | `(args) => void \| Promise<void>` | Non | Execute avant handler |
+| `afterAction` | `(args) => TOutput \| void \| Promise<TOutput \| void>` | Non | Execute apres handler |
+| `handler` | `({ input, ctx }) => Promise<TOutput>` | Oui | Implementation principale |
 
 ## Exemple
 
-```ts filename="app/actions.ts"
+```ts app/actions.ts
 import { defineAction } from "@zapaction/core";
 import { z } from "zod";
 
-export const listTodos = defineAction({
-  name: "listTodos",
-  input: z.object({}),
-  output: z.array(z.object({ id: z.string(), title: z.string(), done: z.boolean() })),
-  handler: async () => []
+export const updateTodo = defineAction({
+  name: "updateTodo",
+  input: z.object({ id: z.string(), done: z.boolean() }),
+  output: z.object({ id: z.string(), done: z.boolean() }),
+  tags: ["todos"],
+  handler: async ({ input }) => ({
+    id: input.id,
+    done: input.done
+  })
 });
 ```

@@ -1,0 +1,66 @@
+---
+title: "Auth Patterns"
+description: "Inject authentication context once and enforce authorization in actions."
+---
+
+# Auth Patterns
+
+## Configure context once
+
+```ts app/bootstrap.server.ts
+import { setActionContext } from "@zapaction/core";
+
+setActionContext(async () => {
+  const session = { user: { id: "u_123", role: "admin" } };
+
+  if (!session.user) {
+    throw new Error("Unauthorized");
+  }
+
+  return {
+    userId: session.user.id,
+    role: session.user.role
+  };
+});
+```
+
+## Reusable protected action wrapper
+
+```ts app/protected-action.ts
+import { defineAction, type DefineActionOptions } from "@zapaction/core";
+
+type AppContext = { userId: string; role: "admin" | "user" };
+
+export function protectedAction<TInput, TOutput>(
+  options: DefineActionOptions<TInput, TOutput, AppContext>
+) {
+  return defineAction<TInput, TOutput, AppContext>({
+    ...options,
+    beforeAction: async (args) => {
+      if (!args.ctx.userId) {
+        throw new Error("Unauthorized");
+      }
+      await options.beforeAction?.(args);
+    }
+  });
+}
+```
+
+## Role checks
+
+```ts app/actions/admin.ts
+import { z } from "zod";
+
+import { protectedAction } from "../protected-action";
+
+export const deleteUser = protectedAction({
+  input: z.object({ userId: z.string() }),
+  output: z.object({ ok: z.literal(true) }),
+  handler: async ({ ctx }) => {
+    if (ctx.role !== "admin") {
+      throw new Error("Forbidden");
+    }
+    return { ok: true };
+  }
+});
+```

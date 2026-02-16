@@ -1,0 +1,60 @@
+---
+title: "Architecture"
+description: "Recommended package and feature boundaries for ZapAction projects."
+---
+
+# Architecture
+
+## High-level flow
+
+1. Server action contracts live close to the domain.
+2. Query keys and tags are defined once per feature.
+3. Client components call actions through query and mutation hooks.
+4. Cache invalidation is driven by tags, not ad-hoc manual keys.
+
+## Recommended folders
+
+```txt project tree
+app/
+  actions/
+    todos.ts
+    users.ts
+  providers.tsx
+  query-keys.ts
+features/
+  todos/
+    ui/
+    tests/
+packages/
+  core/
+  react/
+  query/
+```
+
+## Keep contracts close to features
+
+```ts app/actions/todos.ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const listTodos = defineAction({
+  input: z.object({}),
+  output: z.array(z.object({ id: z.string(), title: z.string(), done: z.boolean() })),
+  handler: async () => []
+});
+```
+
+## Keep query key strategy explicit
+
+```ts app/query-keys.ts
+import { createFeatureKeys, createFeatureTags } from "@zapaction/core";
+
+export const todoKeys = createFeatureKeys("todos", {
+  all: () => [],
+  byId: (id: string) => ["by-id", id]
+});
+
+export const todoTags = createFeatureTags("todos", {
+  byId: (id: string) => ["by-id", id]
+});
+```

@@ -1,6 +1,6 @@
 ---
 title: "Introduction"
-description: "Overview of ZapAction and the recommended docs path."
+description: "What ZapAction solves and the shortest path to production usage."
 ---
 
 # Introduction
@@ -9,14 +9,21 @@ ZapAction is a typed contract layer for **Next.js Server Actions** and **TanStac
 
 ## What you get
 
-- Input/output validation with `defineAction` and Zod
-- Predictable query keys and cache tags
-- Shared cache invalidation model across server and client
-- Clean adoption path for teams
+- Runtime validation for input and output with Zod.
+- Shared cache invalidation model between server and client.
+- Query key and cache tag helpers for predictable data flows.
+- React hooks that keep loading, success, and error states explicit.
+
+## Mental model
+
+1. `defineAction` is the source of truth for action contracts.
+2. `setActionContext` injects request context on the server.
+3. `useActionQuery` is for reads and enforces `readPolicy: "read-only"`.
+4. `useActionMutation` is for writes and tag-based invalidation.
 
 ## Suggested path
 
-1. Start with **Project Setup**
-2. Move to **React Query** integration
-3. Validate with **Testing Patterns**
-4. Use the **Full CRUD** example as reference
+1. Start with [Project Setup](/en/guide/project-setup).
+2. Continue with [React Query](/en/guide/react-query).
+3. Validate behavior in [Testing Patterns](/en/guide/testing-patterns).
+4. Reuse the [Full CRUD Example](/en/examples/full-crud).

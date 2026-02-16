@@ -1,0 +1,39 @@
+---
+title: "Products Cart Module"
+description: "Strategie keys/tags par feature pour un flux ecommerce modulaire."
+---
+
+# Products Cart Module
+
+## Objectif
+
+Isoler les lectures/ecritures du panier par feature tout en gardant une invalidation coherente.
+
+## Keys et tags par feature
+
+```ts features/cart/query-keys.ts
+import { createFeatureKeys, createFeatureTags } from "@zapaction/core";
+
+export const cartKeys = createFeatureKeys("cart", {
+  all: () => [],
+  byUser: (userId: string) => ["by-user", userId]
+});
+
+export const cartTags = createFeatureTags("cart", {
+  byUser: (userId: string) => ["by-user", userId]
+});
+```
+
+## Contrats d'action
+
+```ts features/cart/actions.ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const addToCart = defineAction({
+  input: z.object({ userId: z.string(), productId: z.string(), qty: z.number().min(1) }),
+  output: z.object({ ok: z.literal(true) }),
+  tags: ["cart"],
+  handler: async () => ({ ok: true })
+});
+```

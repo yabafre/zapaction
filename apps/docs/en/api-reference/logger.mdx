@@ -1,0 +1,44 @@
+---
+title: "Logger"
+description: "Configure action lifecycle logging in @zapaction/core."
+---
+
+# Logger
+
+## Configure global logger
+
+```ts app/bootstrap.server.ts
+import { configureLogger } from "@zapaction/core";
+
+configureLogger({
+  enabled: true,
+  level: "info",
+  onLog: (event) => {
+    console.log("zapaction", event.phase, event.duration);
+  }
+});
+```
+
+## Log levels
+
+- `debug`
+- `info`
+- `warn`
+- `error`
+
+## Lifecycle phases
+
+- `action_start`
+- `context_resolved`
+- `before_action`
+- `handler_complete`
+- `after_action`
+- `validation_complete`
+- `revalidation_complete`
+- `action_error`
+
+## API
+
+```ts packages/core/src/logger.ts
+export function configureLogger(options: LoggerOptions): void
+```

@@ -1,0 +1,50 @@
+---
+title: "useAction"
+description: "Client hook from @zapaction/react for imperative action execution."
+---
+
+# useAction
+
+## Signature
+
+```ts packages/react/src/useAction.ts
+export function useAction<TInput, TOutput>(
+  action: DefinedAction<TInput, TOutput>
+): UseActionResult<TInput, TOutput>
+```
+
+## Returned state
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `execute` | `(input: TInput) => Promise<TOutput>` | Executes the action |
+| `data` | `TOutput \| undefined` | Last successful value |
+| `error` | `unknown` | Last thrown error |
+| `status` | `idle \| pending \| success \| error` | Current state |
+| `reset` | `() => void` | Resets state to `idle` |
+
+## Example
+
+```tsx components/create-user-form.tsx
+"use client";
+
+import { useAction } from "@zapaction/react";
+
+import { createUser } from "../app/actions";
+
+export function CreateUserForm() {
+  const action = useAction(createUser);
+
+  return (
+    <form
+      onSubmit={async (event) => {
+        event.preventDefault();
+        await action.execute({ email: "hello@example.com" });
+      }}
+    >
+      <button disabled={action.isPending}>Create</button>
+      {action.isError ? <p>Request failed</p> : null}
+    </form>
+  );
+}
+```

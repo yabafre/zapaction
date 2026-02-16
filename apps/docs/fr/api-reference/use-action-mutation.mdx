@@ -1,0 +1,36 @@
+---
+title: "useActionMutation"
+description: "Hook d'ecriture de @zapaction/query avec invalidation par tags."
+---
+
+# useActionMutation
+
+## Signature
+
+```ts packages/query/src/useActionMutation.ts
+export function useActionMutation<TInput, TOutput, TError = unknown, TContext = unknown>(
+  action: DefinedAction<TInput, TOutput>,
+  options?: UseActionMutationOptions<TInput, TOutput, TError, TContext>
+): UseMutationResult<TOutput, TError, TInput, TContext>
+```
+
+## Options specifiques
+
+| Option | Type | Defaut | Notes |
+| --- | --- | --- | --- |
+| `invalidateOnSuccess` | `boolean` | `true` | Invalidation apres succes |
+| `invalidateWithTags` | `readonly string[]` | `action.tags` | Override des tags |
+
+## Exemple
+
+```tsx components/create-todo.tsx
+"use client";
+
+import { useActionMutation } from "@zapaction/query";
+
+import { createTodo } from "../app/actions";
+
+const mutation = useActionMutation(createTodo, {
+  invalidateOnSuccess: true
+});
+```

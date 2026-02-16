@@ -1,0 +1,55 @@
+---
+title: "Cache Tags"
+description: "Tag registry and invalidation model across server and client."
+---
+
+# Cache Tags
+
+## Why tags
+
+Tags let the server and client share one invalidation vocabulary.
+
+## Register tags on client
+
+```ts app/providers.tsx
+import { setTagRegistry } from "@zapaction/query";
+
+setTagRegistry({
+  todos: [["todos"]],
+  todoById: ({ input }) => [["todos", "by-id", (input as { id?: string })?.id ?? "unknown"]]
+});
+```
+
+## Attach tags on server actions
+
+```ts app/actions.ts
+import { defineAction } from "@zapaction/core";
+
+export const updateTodo = defineAction({
+  input: someSchema,
+  output: resultSchema,
+  tags: ["todos", "todoById"],
+  handler: async ({ input }) => {
+    return updateInDb(input);
+  }
+});
+```
+
+## Server revalidation
+
+`defineAction` triggers `revalidateTags(tags)` when tags are present.
+
+```ts packages/core/src/revalidateTags.ts
+export async function revalidateTags(tags?: readonly string[]): Promise<void>
+```
+
+## Client invalidation
+
+`useActionMutation` triggers `invalidateTags(queryClient, tags)` after success.
+
+```ts packages/query/src/invalidateTags.ts
+export async function invalidateTags(
+  queryClient: QueryClient,
+  tags?: readonly string[]
+): Promise<void>
+```

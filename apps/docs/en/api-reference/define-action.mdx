@@ -1,36 +1,52 @@
 ---
 title: "defineAction"
-description: "Typed action contract API."
+description: "Typed action contract API from @zapaction/core."
 ---
 
 # defineAction
 
-`defineAction` validates input and output at runtime and preserves static typing.
+`defineAction` validates input/output at runtime and keeps static typing across server and client usage.
 
 ## Signature
 
-```ts filename="packages/core/src/defineAction.ts"
-defineAction({
-  name?: string,
-  input: ZodSchema,
-  output: ZodSchema,
-  tags?: readonly string[],
-  beforeAction?: (ctx) => void | Promise<void>,
-  afterAction?: (ctx) => void | Promise<void>,
-  handler: ({ input, context }) => Promise<Output>
-})
+```ts packages/core/src/defineAction.ts
+export function defineAction<TInput, TOutput, TContext = unknown>(
+  options: DefineActionOptions<TInput, TOutput, TContext>
+): DefinedAction<TInput, TOutput>
 ```
+
+## Options
+
+| Option | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `input` | `ZodType<TInput>` | Yes | Runtime input validation |
+| `output` | `ZodType<TOutput>` | No | Runtime output validation |
+| `name` | `string` | No | Used by logger |
+| `tags` | `readonly string[]` | No | Passed to `revalidateTags` |
+| `beforeAction` | `(args) => void \| Promise<void>` | No | Runs before handler |
+| `afterAction` | `(args) => TOutput \| void \| Promise<TOutput \| void>` | No | Runs after handler, may override result |
+| `handler` | `({ input, ctx }) => Promise<TOutput>` | Yes | Main implementation |
 
 ## Example
 
-```ts filename="app/actions.ts"
+```ts app/actions.ts
 import { defineAction } from "@zapaction/core";
 import { z } from "zod";
 
-export const listTodos = defineAction({
-  name: "listTodos",
-  input: z.object({}),
-  output: z.array(z.object({ id: z.string(), title: z.string(), done: z.boolean() })),
-  handler: async () => []
+export const updateTodo = defineAction({
+  name: "updateTodo",
+  input: z.object({ id: z.string(), done: z.boolean() }),
+  output: z.object({ id: z.string(), done: z.boolean() }),
+  tags: ["todos"],
+  handler: async ({ input }) => ({
+    id: input.id,
+    done: input.done
+  })
 });
 ```
+
+## Failure modes
+
+- Missing context factory throws a runtime error from `resolveActionContext`.
+- Invalid input/output throws Zod validation errors.
+- Empty tags are ignored by server revalidation.

@@ -1,0 +1,45 @@
+---
+title: "Auth Patterns"
+description: "Injecter le contexte auth une fois et appliquer les regles dans les actions."
+---
+
+# Auth Patterns
+
+## Configurer le contexte
+
+```ts app/bootstrap.server.ts
+import { setActionContext } from "@zapaction/core";
+
+setActionContext(async () => {
+  const session = { user: { id: "u_123", role: "admin" } };
+
+  if (!session.user) {
+    throw new Error("Unauthorized");
+  }
+
+  return {
+    userId: session.user.id,
+    role: session.user.role
+  };
+});
+```
+
+## Wrapper d'action protegee
+
+```ts app/protected-action.ts
+import { defineAction, type DefineActionOptions } from "@zapaction/core";
+
+type AppContext = { userId: string; role: "admin" | "user" };
+
+export function protectedAction<TInput, TOutput>(
+  options: DefineActionOptions<TInput, TOutput, AppContext>
+) {
+  return defineAction<TInput, TOutput, AppContext>({
+    ...options,
+    beforeAction: async (args) => {
+      if (!args.ctx.userId) throw new Error("Unauthorized");
+      await options.beforeAction?.(args);
+    }
+  });
+}
+```

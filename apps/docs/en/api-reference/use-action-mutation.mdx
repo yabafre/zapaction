@@ -1,0 +1,46 @@
+---
+title: "useActionMutation"
+description: "Write hook from @zapaction/query with tag-based invalidation."
+---
+
+# useActionMutation
+
+## Signature
+
+```ts packages/query/src/useActionMutation.ts
+export function useActionMutation<TInput, TOutput, TError = unknown, TContext = unknown>(
+  action: DefinedAction<TInput, TOutput>,
+  options?: UseActionMutationOptions<TInput, TOutput, TError, TContext>
+): UseMutationResult<TOutput, TError, TInput, TContext>
+```
+
+## Extra options
+
+| Option | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `invalidateOnSuccess` | `boolean` | `true` | Enables invalidation after success |
+| `invalidateWithTags` | `readonly string[]` | `action.tags` | Overrides tags to invalidate |
+
+## Example
+
+```tsx components/create-todo.tsx
+"use client";
+
+import { useActionMutation } from "@zapaction/query";
+
+import { createTodo } from "../app/actions";
+
+const mutation = useActionMutation(createTodo, {
+  invalidateOnSuccess: true,
+  onSuccess: async () => {
+    console.log("todo created");
+  }
+});
+```
+
+## Invalidation resolution
+
+1. Resolve tags from `invalidateWithTags ?? action.tags`.
+2. Map tags to query keys from registry.
+3. Deduplicate query keys.
+4. Call `queryClient.invalidateQueries` for each key.

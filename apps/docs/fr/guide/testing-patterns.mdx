@@ -1,13 +1,32 @@
 ---
 title: "Testing Patterns"
-description: "Patterns Vitest pour actions, hooks et invalidation query."
+description: "Patterns Vitest pour actions, hooks et invalidation cache."
 ---
 
 # Testing Patterns
 
-## Test du contrat d'action
+## Statut CI en direct
 
-```ts filename="features/todos/actions.test.ts"
+[![CI](https://github.com/yabafre/zapaction/actions/workflows/ci.yml/badge.svg)](https://github.com/yabafre/zapaction/actions/workflows/ci.yml)
+
+## Lancer les tests localement
+
+```bash terminal
+pnpm test
+```
+
+Dernier run local dans ce repository:
+
+```txt terminal output
+@zapaction/core:  Test Files 5 passed, Tests 35 passed
+@zapaction/react: Test Files 2 passed, Tests 14 passed
+@zapaction/query: Test Files 3 passed, Tests 6 passed
+Total tests passed: 55
+```
+
+## Test de contrat d'action
+
+```ts features/todos/actions.test.ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { __resetActionContextForTests, setActionContext } from "@zapaction/core";
 import { createTodo } from "./actions";
@@ -20,19 +39,9 @@ describe("createTodo", () => {
     setActionContext(async () => ({ userId: "test-user" }));
   });
 
-  it("cree un todo avec un input valide", async () => {
+  it("cree un todo valide", async () => {
     const result = await createTodo({ title: "Ecrire des tests" });
-    expect(result.title).toBe("Ecrire des tests");
+    expect(result.title).toContain("Ecrire des tests");
   });
 });
-```
-
-## Test de l'invalidation mutation/query
-
-```ts filename="packages/query/src/useActionMutation.test.ts"
-import { vi } from "vitest";
-
-vi.mock("@tanstack/react-query", () => ({
-  useQueryClient: () => ({ invalidateQueries: vi.fn() })
-}));
 ```

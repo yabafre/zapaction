@@ -1,0 +1,33 @@
+---
+title: "Middleware Hooks"
+description: "Details des hooks beforeAction et afterAction."
+---
+
+# Middleware Hooks
+
+## Types des arguments
+
+```ts packages/core/src/defineAction.ts
+export type BeforeActionArgs<TInput, TContext> = {
+  input: TInput;
+  ctx: TContext;
+};
+
+export type AfterActionArgs<TInput, TOutput, TContext> = {
+  input: TInput;
+  ctx: TContext;
+  result: TOutput;
+};
+```
+
+## beforeAction
+
+- S'execute apres `input.parse`.
+- Recoit input clone + contexte resolu.
+- Ideal pour auth, policy, audit.
+
+## afterAction
+
+- S'execute apres le handler.
+- Peut remplacer le resultat.
+- Ideal pour normaliser la sortie.

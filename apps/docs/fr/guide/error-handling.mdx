@@ -1,0 +1,46 @@
+---
+title: "Error Handling"
+description: "Gerer les erreurs de validation, runtime et UI de facon previsible."
+---
+
+# Error Handling
+
+## Erreurs serveur
+
+```ts app/actions.ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const createTodo = defineAction({
+  input: z.object({ title: z.string().min(1) }),
+  output: z.object({ id: z.string(), title: z.string(), done: z.boolean() }),
+  handler: async ({ input }) => {
+    if (input.title.includes("forbidden")) {
+      throw new Error("Business rule violation");
+    }
+    return { id: "1", title: input.title, done: false };
+  }
+});
+```
+
+## Gestion cote client
+
+```tsx components/create-todo.tsx
+import { useAction } from "@zapaction/react";
+
+const action = useAction(createTodo);
+
+if (action.isError) {
+  return <p>Echec de creation.</p>;
+}
+```
+
+## Boundary de secours
+
+```tsx components/todo-page.tsx
+import { ActionErrorBoundary } from "@zapaction/react";
+
+<ActionErrorBoundary fallback={<p>Une erreur est survenue.</p>}>
+  <TodoPanel />
+</ActionErrorBoundary>;
+```

@@ -1,0 +1,34 @@
+---
+title: "Cache Tags"
+description: "Modele de registre de tags et invalidation serveur/client."
+---
+
+# Cache Tags
+
+## Pourquoi des tags
+
+Les tags permettent un vocabulaire unique d'invalidation entre serveur et client.
+
+## Registre cote client
+
+```ts app/providers.tsx
+import { setTagRegistry } from "@zapaction/query";
+
+setTagRegistry({
+  todos: [["todos"]],
+  todoById: ({ input }) => [["todos", "by-id", (input as { id?: string })?.id ?? "unknown"]]
+});
+```
+
+## Tags sur les actions
+
+```ts app/actions.ts
+import { defineAction } from "@zapaction/core";
+
+export const updateTodo = defineAction({
+  input: someSchema,
+  output: resultSchema,
+  tags: ["todos", "todoById"],
+  handler: async ({ input }) => updateInDb(input)
+});
+```

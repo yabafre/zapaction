@@ -1,0 +1,46 @@
+---
+title: "ActionErrorBoundary"
+description: "Boundary React et hook reset de @zapaction/react."
+---
+
+# ActionErrorBoundary
+
+## API
+
+```ts packages/react/src/ActionErrorBoundary.tsx
+export class ActionErrorBoundary extends Component<ActionErrorBoundaryProps, State> {}
+
+export function useActionErrorReset(): {
+  error: unknown;
+  reset: () => void;
+}
+```
+
+## Usage basique
+
+```tsx components/todo-page.tsx
+"use client";
+
+import { ActionErrorBoundary } from "@zapaction/react";
+
+<ActionErrorBoundary fallback={<p>Une erreur est survenue</p>}>
+  <TodoPanel />
+</ActionErrorBoundary>;
+```
+
+## Usage avec fallback fonctionnel
+
+```tsx components/error-fallback.tsx
+import { ActionErrorBoundary } from "@zapaction/react";
+
+<ActionErrorBoundary
+  fallback={({ error, reset }) => (
+    <div>
+      <p>Echec: {String(error)}</p>
+      <button onClick={reset}>Reessayer</button>
+    </div>
+  )}
+>
+  <TodoPanel />
+</ActionErrorBoundary>;
+```

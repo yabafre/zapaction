@@ -1,6 +1,6 @@
 ---
 title: "Introduction"
-description: "Vue d'ensemble de ZapAction et parcours recommande."
+description: "Ce que ZapAction resolv et le parcours recommande pour demarrer."
 ---
 
 # Introduction
@@ -9,14 +9,21 @@ ZapAction est une couche de contrats types pour **Next.js Server Actions** et **
 
 ## Ce que tu obtiens
 
-- Validation input/output avec `defineAction` et Zod
-- Query keys et cache tags predictibles
-- Invalidation de cache coherente serveur + client
-- Parcours d'adoption clair pour les equipes
+- Validation runtime input/output avec Zod.
+- Modele d'invalidation partage entre serveur et client.
+- Helpers de query keys et cache tags.
+- Hooks React avec etats explicites (`idle`, `pending`, `success`, `error`).
 
-## Parcours recommande
+## Modele mental
 
-1. Commencer par **Project Setup**
-2. Continuer avec **React Query**
-3. Verifier avec **Testing Patterns**
-4. Utiliser **Full CRUD Example** comme reference
+1. `defineAction` est la source de verite du contrat.
+2. `setActionContext` injecte le contexte serveur.
+3. `useActionQuery` sert aux lectures (`readPolicy: "read-only"`).
+4. `useActionMutation` sert aux ecritures avec invalidation par tags.
+
+## Parcours conseille
+
+1. Commencer par [Project Setup](/fr/guide/project-setup).
+2. Continuer avec [React Query](/fr/guide/react-query).
+3. Verifier avec [Testing Patterns](/fr/guide/testing-patterns).
+4. Reutiliser [Full CRUD Example](/fr/examples/full-crud).

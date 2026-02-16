@@ -1,0 +1,55 @@
+---
+title: "Middleware Hooks"
+description: "beforeAction and afterAction contract details."
+---
+
+# Middleware Hooks
+
+## Hook argument types
+
+```ts packages/core/src/defineAction.ts
+export type BeforeActionArgs<TInput, TContext> = {
+  input: TInput;
+  ctx: TContext;
+};
+
+export type AfterActionArgs<TInput, TOutput, TContext> = {
+  input: TInput;
+  ctx: TContext;
+  result: TOutput;
+};
+```
+
+## beforeAction
+
+- Runs after input parsing.
+- Receives cloned input plus resolved context.
+- Best for authorization, policy checks, and auditing.
+
+## afterAction
+
+- Runs after handler.
+- May return a replacement result.
+- Best for output shaping and post-processing.
+
+## Example
+
+```ts app/actions.ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+type AppContext = { userId: string };
+
+export const getProfile = defineAction<{ id: string }, { id: string; owner: string }, AppContext>({
+  input: z.object({ id: z.string() }),
+  output: z.object({ id: z.string(), owner: z.string() }),
+  beforeAction: async ({ ctx }) => {
+    if (!ctx.userId) throw new Error("Unauthorized");
+  },
+  afterAction: async ({ result, ctx }) => ({
+    ...result,
+    owner: ctx.userId
+  }),
+  handler: async ({ input }) => ({ id: input.id, owner: "unknown" })
+});
+```

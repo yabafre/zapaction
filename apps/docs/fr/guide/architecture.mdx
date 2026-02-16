@@ -1,0 +1,45 @@
+---
+title: "Architecture"
+description: "Structure recommandee des dossiers et des responsabilites."
+---
+
+# Architecture
+
+## Flux global
+
+1. Les contrats serveur vivent pres du domaine.
+2. Les query keys et tags sont definis une fois par feature.
+3. Les composants client consomment les actions via hooks query/mutation.
+4. L'invalidation est pilotee par tags, pas par logique ad-hoc.
+
+## Arborescence recommandee
+
+```txt project tree
+app/
+  actions/
+    todos.ts
+    users.ts
+  providers.tsx
+  query-keys.ts
+features/
+  todos/
+    ui/
+    tests/
+packages/
+  core/
+  react/
+  query/
+```
+
+## Exemple de contrat local au domaine
+
+```ts app/actions/todos.ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const listTodos = defineAction({
+  input: z.object({}),
+  output: z.array(z.object({ id: z.string(), title: z.string(), done: z.boolean() })),
+  handler: async () => []
+});
+```

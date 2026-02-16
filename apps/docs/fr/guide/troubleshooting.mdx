@@ -1,0 +1,44 @@
+---
+title: "Troubleshooting"
+description: "Problemes frequents et corrections rapides."
+---
+
+# Troubleshooting
+
+## "Action context factory is not configured"
+
+Cause: `setActionContext` n'est pas execute au bootstrap serveur.
+
+Correction:
+
+```ts app/bootstrap.server.ts
+import { setActionContext } from "@zapaction/core";
+
+setActionContext(async () => ({ userId: "demo" }));
+```
+
+## `useActionQuery requires readPolicy='read-only'`
+
+Cause: option `readPolicy` absente ou invalide.
+
+Correction:
+
+```tsx components/panel.tsx
+useActionQuery(listTodos, {
+  input: {},
+  queryKey: ["todos"],
+  readPolicy: "read-only"
+});
+```
+
+## Les tags n'invalident pas les bonnes queries
+
+Cause: decalage entre tags et registre.
+
+Correction:
+
+```ts app/providers.tsx
+setTagRegistry({
+  todos: [["todos"]]
+});
+```

@@ -1,0 +1,51 @@
+---
+title: "Optimistic Updates"
+description: "Pattern optimistic update avec React Query et ZapAction."
+---
+
+# Optimistic Updates
+
+## Etapes
+
+1. Annuler les requetes actives.
+2. Sauvegarder le cache precedent.
+3. Appliquer la valeur optimiste.
+4. Rollback en cas d'erreur.
+5. Invalider a la fin.
+
+## Exemple
+
+```tsx components/todo-toggle.tsx
+"use client";
+
+import { useQueryClient } from "@tanstack/react-query";
+import { useActionMutation } from "@zapaction/query";
+
+import { toggleTodo } from "../app/actions";
+import { todoKeys } from "../app/query-keys";
+
+const queryClient = useQueryClient();
+
+const mutation = useActionMutation(toggleTodo, {
+  onMutate: async (variables) => {
+    await queryClient.cancelQueries({ queryKey: todoKeys.all() });
+    const previous = queryClient.getQueryData(todoKeys.all());
+
+    queryClient.setQueryData(todoKeys.all(), (current: any[] = []) =>
+      current.map((todo) =>
+        todo.id === variables.id ? { ...todo, done: !todo.done } : todo
+      )
+    );
+
+    return { previous };
+  },
+  onError: (_error, _variables, context) => {
+    if (context?.previous) {
+      queryClient.setQueryData(todoKeys.all(), context.previous);
+    }
+  },
+  onSettled: async () => {
+    await queryClient.invalidateQueries({ queryKey: todoKeys.all() });
+  }
+});
+```

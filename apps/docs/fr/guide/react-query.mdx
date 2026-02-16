@@ -7,37 +7,47 @@ description: "Lecture et ecriture avec useActionQuery et useActionMutation."
 
 ## Installation
 
-```bash filename="terminal"
+```bash terminal
 pnpm add @zapaction/query @tanstack/react-query
 ```
 
-## Usage
+## Lecture avec useActionQuery
 
-```tsx filename="components/todo-panel.tsx"
+```tsx components/todo-panel.tsx
 "use client";
 
-import { useActionMutation, useActionQuery } from "@zapaction/query";
+import { useActionQuery } from "@zapaction/query";
+import { listTodos } from "../app/actions";
 
-import { createTodo, listTodos } from "../app/actions";
-
-const { data: todos, isPending, isError } = useActionQuery(listTodos, {
+const todosQuery = useActionQuery(listTodos, {
   input: {},
   queryKey: ["todos"],
   readPolicy: "read-only"
 });
-
-const createMutation = useActionMutation(createTodo);
 ```
 
-## Resultats de test en direct (workflow)
+## Ecriture avec useActionMutation
 
-```bash filename="terminal"
-pnpm test
+```tsx components/todo-panel.tsx
+import { useActionMutation } from "@zapaction/query";
+import { createTodo } from "../app/actions";
+
+const createMutation = useActionMutation(createTodo, {
+  invalidateOnSuccess: true
+});
 ```
 
-Sortie attendue dans ce repository:
+## Alignement keys/tags
 
-```txt filename="terminal output"
-Test Files 10 passed
-Tests 55 passed
+```ts app/query-keys.ts
+import { createFeatureKeys, createFeatureTags } from "@zapaction/core";
+
+export const todoKeys = createFeatureKeys("todos", {
+  all: () => [],
+  byUser: (userId: string) => ["by-user", userId]
+});
+
+export const todoTags = createFeatureTags("todos", {
+  byUser: (userId: string) => ["by-user", userId]
+});
 ```

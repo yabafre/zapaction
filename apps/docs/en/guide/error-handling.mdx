@@ -1,0 +1,54 @@
+---
+title: "Error Handling"
+description: "Handle validation, runtime, and UI errors with predictable boundaries."
+---
+
+# Error Handling
+
+## Server-side errors
+
+`defineAction` may throw from validation, context resolution, or handler logic.
+
+```ts app/actions.ts
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const createTodo = defineAction({
+  input: z.object({ title: z.string().min(1) }),
+  output: z.object({ id: z.string(), title: z.string(), done: z.boolean() }),
+  handler: async ({ input }) => {
+    if (input.title.includes("forbidden")) {
+      throw new Error("Business rule violation");
+    }
+    return { id: "1", title: input.title, done: false };
+  }
+});
+```
+
+## Hook-level client handling
+
+```tsx components/create-todo.tsx
+import { useAction } from "@zapaction/react";
+
+const action = useAction(createTodo);
+
+if (action.isError) {
+  return <p>Could not create todo.</p>;
+}
+```
+
+## Boundary-level handling
+
+```tsx components/todo-page.tsx
+import { ActionErrorBoundary } from "@zapaction/react";
+
+<ActionErrorBoundary fallback={<p>Something went wrong.</p>}>
+  <TodoPanel />
+</ActionErrorBoundary>;
+```
+
+## Recommendations
+
+- Throw typed domain errors from handlers when possible.
+- Keep user-facing messages at UI boundary level.
+- Test both validation and runtime paths.

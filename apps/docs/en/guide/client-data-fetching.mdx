@@ -1,0 +1,67 @@
+---
+title: "Client Data Fetching"
+description: "Use action-based reads and writes while keeping query behavior explicit."
+---
+
+# Client Data Fetching
+
+## Read model
+
+For reads, use `useActionQuery` and always pass `readPolicy: "read-only"`.
+
+```tsx components/todo-list.tsx
+"use client";
+
+import { useActionQuery } from "@zapaction/query";
+
+import { listTodos } from "../app/actions";
+import { todoKeys } from "../app/query-keys";
+
+export function TodoList() {
+  const query = useActionQuery(listTodos, {
+    input: {},
+    queryKey: todoKeys.all(),
+    readPolicy: "read-only"
+  });
+
+  if (query.isPending) return <p>Loading...</p>;
+  if (query.isError) return <p>Error</p>;
+
+  return (
+    <ul>
+      {query.data?.map((todo) => (
+        <li key={todo.id}>{todo.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## Write model
+
+```tsx components/create-todo.tsx
+"use client";
+
+import { useActionMutation } from "@zapaction/query";
+
+import { createTodo } from "../app/actions";
+
+export function CreateTodo() {
+  const mutation = useActionMutation(createTodo);
+
+  return (
+    <button
+      onClick={() => mutation.mutate({ title: "Write docs" })}
+      disabled={mutation.isPending}
+    >
+      Add
+    </button>
+  );
+}
+```
+
+## Why this split matters
+
+- Reads stay declarative and cacheable.
+- Writes stay imperative and invalidation-aware.
+- UI state transitions are explicit and easy to test.

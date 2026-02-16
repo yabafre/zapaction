@@ -1,0 +1,37 @@
+---
+title: "Client Data Fetching"
+description: "Lecture et ecriture cote client avec un comportement explicite."
+---
+
+# Client Data Fetching
+
+## Mode lecture
+
+`useActionQuery` est reserve aux lectures et exige `readPolicy: "read-only"`.
+
+```tsx components/todo-list.tsx
+"use client";
+
+import { useActionQuery } from "@zapaction/query";
+
+import { listTodos } from "../app/actions";
+import { todoKeys } from "../app/query-keys";
+
+const query = useActionQuery(listTodos, {
+  input: {},
+  queryKey: todoKeys.all(),
+  readPolicy: "read-only"
+});
+```
+
+## Mode ecriture
+
+```tsx components/create-todo.tsx
+"use client";
+
+import { useActionMutation } from "@zapaction/query";
+
+import { createTodo } from "../app/actions";
+
+const mutation = useActionMutation(createTodo);
+```

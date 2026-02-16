@@ -1,0 +1,59 @@
+---
+title: "Troubleshooting"
+description: "Common setup and runtime problems with practical fixes."
+---
+
+# Troubleshooting
+
+## "Action context factory is not configured"
+
+Cause: `setActionContext` was not executed on server bootstrap.
+
+Fix:
+
+```ts app/bootstrap.server.ts
+import { setActionContext } from "@zapaction/core";
+
+setActionContext(async () => ({ userId: "demo" }));
+```
+
+## `useActionQuery requires readPolicy='read-only'`
+
+Cause: missing or invalid `readPolicy` option.
+
+Fix:
+
+```tsx components/panel.tsx
+useActionQuery(listTodos, {
+  input: {},
+  queryKey: ["todos"],
+  readPolicy: "read-only"
+});
+```
+
+## Tags do not invalidate expected queries
+
+Cause: tag registry mismatch between tags and query keys.
+
+Fix:
+
+```ts app/providers.tsx
+setTagRegistry({
+  todos: [["todos"]],
+  user: ({ input }) => [["users", input?.userId ?? "unknown"]]
+});
+```
+
+## Client-side boundary reset throws
+
+Cause: `useActionErrorReset` was used outside boundary fallback.
+
+Fix: call the hook only inside fallback content rendered by `ActionErrorBoundary`.
+
+## Build/runtime checks
+
+```bash terminal
+pnpm build
+pnpm typecheck
+pnpm test
+```

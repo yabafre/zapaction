@@ -1,0 +1,24 @@
+---
+title: "useAction"
+description: "Hook client de @zapaction/react pour executer une action imperativement."
+---
+
+# useAction
+
+## Signature
+
+```ts packages/react/src/useAction.ts
+export function useAction<TInput, TOutput>(
+  action: DefinedAction<TInput, TOutput>
+): UseActionResult<TInput, TOutput>
+```
+
+## Etat retourne
+
+| Champ | Type | Description |
+| --- | --- | --- |
+| `execute` | `(input: TInput) => Promise<TOutput>` | Execute l'action |
+| `data` | `TOutput \| undefined` | Derniere valeur en succes |
+| `error` | `unknown` | Derniere erreur |
+| `status` | `idle \| pending \| success \| error` | Etat courant |
+| `reset` | `() => void` | Reinitialise l'etat |

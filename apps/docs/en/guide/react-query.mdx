@@ -5,41 +5,59 @@ description: "Read and write data with useActionQuery and useActionMutation."
 
 # React Query
 
-## Installation
+## Install
 
-```bash filename="terminal"
+```bash terminal
 pnpm add @zapaction/query @tanstack/react-query
 ```
 
-## Usage
+## Read with useActionQuery
 
-```tsx filename="components/todo-panel.tsx"
+`useActionQuery` requires `readPolicy: "read-only"` so reads stay explicit.
+
+```tsx components/todo-panel.tsx
 "use client";
 
-import { useActionMutation, useActionQuery } from "@zapaction/query";
+import { useActionQuery } from "@zapaction/query";
+import { listTodos } from "../app/actions";
 
-import { createTodo, listTodos } from "../app/actions";
-
-const { data: todos, isPending, isError } = useActionQuery(listTodos, {
+const todosQuery = useActionQuery(listTodos, {
   input: {},
   queryKey: ["todos"],
   readPolicy: "read-only"
 });
-
-const createMutation = useActionMutation(createTodo);
 ```
 
-## Live test result workflow
+## Write with useActionMutation
 
-Run local tests while editing docs:
+```tsx components/todo-panel.tsx
+import { useActionMutation } from "@zapaction/query";
+import { createTodo } from "../app/actions";
 
-```bash filename="terminal"
-pnpm test
+const createMutation = useActionMutation(createTodo, {
+  invalidateOnSuccess: true
+});
 ```
 
-Expected result in this repository:
+## Keep query keys and tags aligned
 
-```txt filename="terminal output"
-Test Files 10 passed
-Tests 55 passed
+```ts app/query-keys.ts
+import { createFeatureKeys, createFeatureTags } from "@zapaction/core";
+
+export const todoKeys = createFeatureKeys("todos", {
+  all: () => [],
+  byUser: (userId: string) => ["by-user", userId]
+});
+
+export const todoTags = createFeatureTags("todos", {
+  byUser: (userId: string) => ["by-user", userId]
+});
 ```
+
+## Result preview
+
+```txt ui state
+idle -> pending -> success | error
+```
+
+A clear state model makes retries and UX fallback logic easier to maintain.
