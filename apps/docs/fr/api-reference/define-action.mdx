@@ -1,0 +1,36 @@
+---
+title: "defineAction"
+description: "API de contrat d'action type."
+---
+
+# defineAction
+
+`defineAction` valide l'input et l'output a l'execution tout en conservant le typage static.
+
+## Signature
+
+```ts filename="packages/core/src/defineAction.ts"
+defineAction({
+  name?: string,
+  input: ZodSchema,
+  output: ZodSchema,
+  tags?: readonly string[],
+  beforeAction?: (ctx) => void | Promise<void>,
+  afterAction?: (ctx) => void | Promise<void>,
+  handler: ({ input, context }) => Promise<Output>
+})
+```
+
+## Exemple
+
+```ts filename="app/actions.ts"
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const listTodos = defineAction({
+  name: "listTodos",
+  input: z.object({}),
+  output: z.array(z.object({ id: z.string(), title: z.string(), done: z.boolean() })),
+  handler: async () => []
+});
+```

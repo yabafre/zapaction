@@ -1,0 +1,43 @@
+---
+title: "React Query"
+description: "Lecture et ecriture avec useActionQuery et useActionMutation."
+---
+
+# React Query
+
+## Installation
+
+```bash filename="terminal"
+pnpm add @zapaction/query @tanstack/react-query
+```
+
+## Usage
+
+```tsx filename="components/todo-panel.tsx"
+"use client";
+
+import { useActionMutation, useActionQuery } from "@zapaction/query";
+
+import { createTodo, listTodos } from "../app/actions";
+
+const { data: todos, isPending, isError } = useActionQuery(listTodos, {
+  input: {},
+  queryKey: ["todos"],
+  readPolicy: "read-only"
+});
+
+const createMutation = useActionMutation(createTodo);
+```
+
+## Resultats de test en direct (workflow)
+
+```bash filename="terminal"
+pnpm test
+```
+
+Sortie attendue dans ce repository:
+
+```txt filename="terminal output"
+Test Files 10 passed
+Tests 55 passed
+```

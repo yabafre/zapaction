@@ -1,0 +1,38 @@
+---
+title: "Testing Patterns"
+description: "Patterns Vitest pour actions, hooks et invalidation query."
+---
+
+# Testing Patterns
+
+## Test du contrat d'action
+
+```ts filename="features/todos/actions.test.ts"
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { __resetActionContextForTests, setActionContext } from "@zapaction/core";
+import { createTodo } from "./actions";
+
+vi.mock("next/cache", () => ({ revalidateTag: vi.fn() }));
+
+describe("createTodo", () => {
+  beforeEach(() => {
+    __resetActionContextForTests();
+    setActionContext(async () => ({ userId: "test-user" }));
+  });
+
+  it("cree un todo avec un input valide", async () => {
+    const result = await createTodo({ title: "Ecrire des tests" });
+    expect(result.title).toBe("Ecrire des tests");
+  });
+});
+```
+
+## Test de l'invalidation mutation/query
+
+```ts filename="packages/query/src/useActionMutation.test.ts"
+import { vi } from "vitest";
+
+vi.mock("@tanstack/react-query", () => ({
+  useQueryClient: () => ({ invalidateQueries: vi.fn() })
+}));
+```

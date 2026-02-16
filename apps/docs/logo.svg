@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 32" role="img" aria-label="ZapAction logo">
+  <rect width="128" height="32" fill="none" />
+  <g transform="translate(2,4)">
+    <path d="M14 0 4 14h7l-2 10 12-15h-8l1-9Z" fill="#6366f1"/>
+    <circle cx="24" cy="20" r="4" fill="#22c55e"/>
+  </g>
+  <text x="38" y="22" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI" font-size="14" font-weight="700" fill="#111827">ZapAction</text>
+</svg>

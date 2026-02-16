@@ -1,0 +1,56 @@
+---
+title: "Project Setup"
+description: "Install and bootstrap ZapAction in a Next.js App Router project."
+---
+
+# Project Setup
+
+## Install packages
+
+```bash filename="terminal"
+pnpm add @zapaction/core @zapaction/react @zapaction/query @tanstack/react-query zod
+```
+
+## Define one server action
+
+```ts filename="app/actions.ts"
+"use server";
+
+import { defineAction } from "@zapaction/core";
+import { z } from "zod";
+
+export const createTodo = defineAction({
+  name: "createTodo",
+  input: z.object({ title: z.string().min(1) }),
+  output: z.object({
+    id: z.string(),
+    title: z.string(),
+    done: z.boolean()
+  }),
+  tags: ["todos"],
+  handler: async ({ input }) => ({
+    id: crypto.randomUUID(),
+    title: input.title,
+    done: false
+  })
+});
+```
+
+## Provide React Query + tag registry
+
+```tsx filename="app/providers.tsx"
+"use client";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { setTagRegistry } from "@zapaction/query";
+import { useState } from "react";
+
+setTagRegistry({
+  todos: [["todos"]]
+});
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+}
+```
