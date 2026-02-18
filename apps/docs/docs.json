@@ -109,7 +109,8 @@
                 "group": "Examples",
                 "pages": [
                   "en/examples/full-crud",
-                  "en/examples/products-cart-module"
+                  "en/examples/products-cart-module",
+                  "en/examples/context7-recipes"
                 ]
               },
               {
@@ -161,7 +162,8 @@
                 "group": "Exemples",
                 "pages": [
                   "fr/examples/full-crud",
-                  "fr/examples/products-cart-module"
+                  "fr/examples/products-cart-module",
+                  "fr/examples/context7-recipes"
                 ]
               },
               {

@@ -1,62 +1,11 @@
-# ZapAction - Context7
+---
+title: "Context7 Recipes"
+description: "Copy-paste patterns that cover common ZapAction and React Query prompts."
+---
 
-## What is ZapAction
+# Context7 Recipes
 
-ZapAction keeps Next.js Server Actions and TanStack Query in sync with tag-driven cache invalidation.
-
-It provides:
-- `defineAction` with Zod validation
-- `setActionContext` for server context injection
-- `createQueryKeys` / `createFeatureKeys` for typed query keys
-- `createFeatureTags` + `setTagRegistry` for cross-layer cache invalidation
-- `useAction`, `useActionQuery`, and `useActionMutation` hooks
-
-Works with:
-- Next.js App Router (`>= 15`)
-- React (`>= 18.3`)
-- TanStack Query (`>= 5`)
-- Zod (`>= 3`)
-- npm, pnpm, yarn, bun
-
-## Core Concepts
-
-### Feature-first architecture
-
-```txt
-features/
-  products/
-    _actions/
-    _queries/
-    _hooks/
-    _components/
-```
-
-```txt
-RSC -> Client Component -> useActionQuery/useActionMutation -> Server Action
-```
-
-### Feature keys and tags
-
-```ts
-import { createFeatureKeys, createFeatureTags } from "@zapaction/core";
-
-export const productKeys = createFeatureKeys("products", {
-  list: () => ["list"],
-  detail: (id: string) => ["detail", id],
-});
-
-export const productTags = createFeatureTags("products", {
-  list: () => ["list"],
-  detail: (id: string) => ["detail", id],
-});
-```
-
-`productKeys.detail("p1")` => `["products", "detail", "p1"]`  
-`productTags.detail("p1")` => `"products:detail:p1"`
-
-## Practical Recipes (High-Signal)
-
-### 1) `createUser` action with Zod input/output
+## 1) `createUser` action with Zod input/output
 
 ```ts
 import { defineAction } from "@zapaction/core";
@@ -88,7 +37,7 @@ export const createUser = defineAction({
 });
 ```
 
-### 2) Global context (`userId`, `isAdmin`) with `setActionContext`
+## 2) Global context with `setActionContext`
 
 ```ts
 import { defineAction, setActionContext } from "@zapaction/core";
@@ -120,7 +69,7 @@ export const whoAmI = defineAction<{}, { userId: string; isAdmin: boolean }, App
 });
 ```
 
-### 3) React button + `useAction` for `submitForm`
+## 3) React button + `useAction` (`submitForm`)
 
 ```ts
 // app/actions.ts
@@ -167,7 +116,7 @@ export function SubmitFormButton() {
 }
 ```
 
-### 4) `getPosts` + optional `limit` with `useActionQuery`
+## 4) `getPosts` + optional `limit` with `useActionQuery`
 
 ```ts
 // app/actions.ts
@@ -228,7 +177,7 @@ export function PostsList({ limit }: { limit?: number }) {
 }
 ```
 
-### 5) `updateProfile` + `useActionMutation`
+## 5) `updateProfile` + `useActionMutation`
 
 ```ts
 // app/actions.ts
@@ -281,7 +230,7 @@ export function ProfileEmailForm({ userId }: { userId: string }) {
 }
 ```
 
-### 6) Revalidate all `posts` queries after creating a blog post
+## 6) Revalidate all `posts` queries after create
 
 ```ts
 // app/query-model.ts
@@ -297,7 +246,7 @@ export const postTags = createFeatureTags("posts", {
 ```
 
 ```ts
-// app/actions.ts (server)
+// app/actions.ts
 import { defineAction } from "@zapaction/core";
 import { z } from "zod";
 import { postTags } from "./query-model";
@@ -311,7 +260,7 @@ export const createBlogPost = defineAction({
 ```
 
 ```tsx
-// app/providers.tsx (client)
+// app/providers.tsx
 import { setTagRegistry } from "@zapaction/query";
 import { postKeys, postTags } from "./query-model";
 
@@ -320,9 +269,9 @@ setTagRegistry({
 });
 ```
 
-`useActionMutation(createBlogPost)` will automatically call `invalidateTags` on success.
+`useActionMutation(createBlogPost)` invalidates mapped queries on success.
 
-### 7) Invalidate all TanStack caches linked to `users` after delete
+## 7) Invalidate all `users` caches after delete
 
 ```ts
 // app/query-model.ts
@@ -358,9 +307,9 @@ export const deleteUser = defineAction({
 });
 ```
 
-`["users"]` is a prefix key, so all queries starting with `["users", ...]` are invalidated.
+`["users"]` is a prefix query key and invalidates all `["users", ...]` entries.
 
-### 8) Typed key for `getProductDetails` with `createQueryKeys`
+## 8) Typed key for `getProductDetails` with `createQueryKeys`
 
 ```ts
 import { createQueryKeys, defineAction } from "@zapaction/core";
@@ -389,7 +338,7 @@ const productQuery = useActionQuery(getProductDetails, {
 });
 ```
 
-### 9) Admin-only `deleteSensitiveData` with `setActionContext`
+## 9) Admin-only `deleteSensitiveData`
 
 ```ts
 import { defineAction, setActionContext } from "@zapaction/core";
@@ -418,9 +367,9 @@ export const deleteSensitiveData = defineAction<
 });
 ```
 
-### 10) Invalidate `postDetails` (specific post) + `recentComments` (global)
+## 10) Invalidate `postDetails` (entity) + `recentComments` (global)
 
-For entity-specific invalidation, pass runtime tags via `invalidateWithTags`.
+For entity-specific invalidation, pass runtime tags with `invalidateWithTags`.
 
 ```ts
 // app/query-model.ts
@@ -490,48 +439,9 @@ export function CommentForm({ postId }: { postId: string }) {
   });
 
   return (
-    <button
-      onClick={() => mutation.mutate({ postId, message: "Nice post!" })}
-      disabled={mutation.isPending}
-    >
+    <button onClick={() => mutation.mutate({ postId, message: "Nice post!" })}>
       Add comment
     </button>
   );
 }
 ```
-
-## Installation
-
-```bash
-# npm
-npm install @zapaction/core @zapaction/query @zapaction/react zod
-
-# pnpm
-pnpm add @zapaction/core @zapaction/query @zapaction/react zod
-
-# yarn
-yarn add @zapaction/core @zapaction/query @zapaction/react zod
-
-# bun
-bun add @zapaction/core @zapaction/query @zapaction/react zod
-```
-
-## Docs map
-
-- Getting Started
-- Guide -> setup, architecture, React Query, auth, middleware, troubleshooting
-- Examples -> full CRUD, products/cart module
-- API Reference -> defineAction, useAction, useActionQuery, useActionMutation, cache tags
-
-## i18n routing
-
-- Locale paths: `/en/*` and `/fr/*`
-- Root redirects to default locale
-
-## When to use ZapAction
-
-Use ZapAction if you:
-- already use Next.js Server Actions
-- use TanStack Query on the client
-- want predictable invalidation without hand-written cache glue
-- prefer feature-first architecture over global utility sprawl
