@@ -60,4 +60,17 @@ describe("useActionMutation", () => {
 
     expect(invalidateQueries).not.toHaveBeenCalled();
   });
+
+  it("defaults TError to Error so consumers can read error.message without narrowing", () => {
+    const action = async (_input: { name: string }) => ({ id: "x" });
+
+    const mutation = useActionMutation(action);
+
+    // No explicit TError generic. If `error` is typed as the default `Error | null`,
+    // reading `.message` directly typechecks. Under the old `unknown` default this
+    // line would fail to compile (TS2339).
+    const message: string | undefined = mutation.error?.message;
+
+    expect(message).toBeUndefined();
+  });
 });
