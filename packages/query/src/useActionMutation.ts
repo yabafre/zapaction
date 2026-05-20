@@ -22,7 +22,7 @@ export type UseActionMutationOptions<
 export function useActionMutation<
   TInput,
   TOutput,
-  TError = unknown,
+  TError = Error,
   TContext = unknown,
 >(
   action: DefinedAction<TInput, TOutput>,

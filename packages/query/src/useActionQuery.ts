@@ -19,7 +19,7 @@ export type UseActionQueryOptions<TInput, TOutput, TError, TData> = Omit<
 export function useActionQuery<
   TInput,
   TOutput,
-  TError = unknown,
+  TError = Error,
   TData = TOutput,
 >(
   action: DefinedAction<TInput, TOutput>,

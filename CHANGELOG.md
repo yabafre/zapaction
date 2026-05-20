@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2026-05-20
+
+### Changed
+- `useActionQuery` / `useActionMutation` / `useAction` now default `TError` to `Error` instead of `unknown`. Consumers reading `error.message` no longer need to narrow or pass an explicit generic. Existing code that explicitly specified `TError` is unaffected. (#2)
+- `useAction`'s `UseActionResult.error` is now typed as `Error | undefined`. Non-`Error` throws are wrapped via `new Error(String(caught))` so the message is always readable without losing the original value's string representation.
+
 ## [0.2.2] - 2026-02-16
 
 ### Fixed

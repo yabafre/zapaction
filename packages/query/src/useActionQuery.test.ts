@@ -31,4 +31,20 @@ describe("useActionQuery", () => {
 
     expect(useQueryMock).toHaveBeenCalledTimes(1);
   });
+
+  it("defaults TError to Error so consumers can read error.message without narrowing", () => {
+    const readAction = (async (_input: {}) => []) as (input: {}) => Promise<unknown[]>;
+
+    const result = useActionQuery(readAction, {
+      input: {},
+      queryKey: ["users"],
+      readPolicy: "read-only",
+    });
+
+    // No explicit TError generic. With `TError = Error` default `.message`
+    // typechecks. Under the old `unknown` default this access fails (TS2339).
+    const message: string | undefined = result.error?.message;
+
+    expect(message).toBeUndefined();
+  });
 });
