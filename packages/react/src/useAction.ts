@@ -7,7 +7,7 @@ export type ActionStatus = "idle" | "pending" | "success" | "error";
 export type UseActionResult<TInput, TOutput> = {
   execute: (input: TInput) => Promise<TOutput>;
   data: TOutput | undefined;
-  error: unknown;
+  error: Error | undefined;
   status: ActionStatus;
   isIdle: boolean;
   isPending: boolean;
@@ -21,7 +21,7 @@ export function useAction<TInput, TOutput>(
 ): UseActionResult<TInput, TOutput> {
   const [status, setStatus] = useState<ActionStatus>("idle");
   const [data, setData] = useState<TOutput | undefined>(undefined);
-  const [error, setError] = useState<unknown>(undefined);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
   const execute = useCallback(
     async (input: TInput): Promise<TOutput> => {
@@ -34,7 +34,7 @@ export function useAction<TInput, TOutput>(
         setStatus("success");
         return result;
       } catch (caught) {
-        setError(caught);
+        setError(caught instanceof Error ? caught : new Error(String(caught)));
         setStatus("error");
         throw caught;
       }

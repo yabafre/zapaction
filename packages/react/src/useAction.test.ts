@@ -140,4 +140,45 @@ describe("useAction", () => {
 
     expect(action).toHaveBeenCalledWith("hello");
   });
+
+  it("exposes error as Error so consumers can read error.message without narrowing", async () => {
+    const action = async (_: string): Promise<string> => {
+      throw new Error("boom");
+    };
+    stateIndex = 0;
+    const { execute } = useAction(action);
+
+    try {
+      await execute("input");
+    } catch {
+      // expected
+    }
+
+    const result = snapshot();
+
+    // With `error: Error | undefined`, `.message` typechecks directly.
+    // Under the old `error: unknown` contract this access would fail (TS2339).
+    const message: string | undefined = result.error?.message;
+
+    expect(message).toBe("boom");
+  });
+
+  it("wraps non-Error throws into Error so message is always readable", async () => {
+    const action = async (_: string): Promise<string> => {
+      throw "raw string";
+    };
+    stateIndex = 0;
+    const { execute } = useAction(action);
+
+    try {
+      await execute("input");
+    } catch {
+      // expected
+    }
+
+    const result = snapshot();
+
+    expect(result.error).toBeInstanceOf(Error);
+    expect(result.error?.message).toBe("raw string");
+  });
 });
