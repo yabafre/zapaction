@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.3.0] - 2026-11-24
 
 ### Added
 - Next.js 16 cache revalidation support in `@zapaction/core`:

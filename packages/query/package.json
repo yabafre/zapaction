@@ -1,6 +1,6 @@
 {
   "name": "@zapaction/query",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "React Query integration for ZapAction with tag-driven invalidation",
   "license": "MIT",
   "type": "module",
