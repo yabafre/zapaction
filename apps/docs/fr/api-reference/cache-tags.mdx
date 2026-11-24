@@ -29,6 +29,30 @@ export const updateTodo = defineAction({
   input: someSchema,
   output: resultSchema,
   tags: ["todos", "todoById"],
+  revalidation: { mode: "update" },
   handler: async ({ input }) => updateInDb(input)
 });
 ```
+
+## Revalidation cote serveur (Next.js 15 & 16)
+
+`defineAction` appelle `revalidateTags(tags, revalidation)` lorsque des tags sont definis.
+
+```ts packages/core/src/revalidateTags.ts
+export type CacheLifeProfile = string | { expire?: number };
+export type RevalidationMode = "revalidate" | "update";
+export type RevalidateTagsOptions = {
+  mode?: RevalidationMode;
+  profile?: CacheLifeProfile;
+};
+
+export async function revalidateTags(
+  tags?: readonly string[],
+  options?: RevalidateTagsOptions
+): Promise<void>
+
+export async function updateTags(tags?: readonly string[]): Promise<void>
+```
+
+- **Par defaut (`mode: "revalidate"`)** : appelle `revalidateTag(tag, profile)` sous Next.js 16 (profil `"max"` par defaut pour le mode stale-while-revalidate ; compatible Server Actions et Route Handlers) avec fallback automatique vers `revalidateTag(tag)` sous Next.js 15.
+- **Immediat (`mode: "update"` ou `updateTags`)** : appelle `updateTag(tag)` sous Next.js 16 pour l'expiration immediate (*read-your-own-writes*) dans une Server Action (fallback vers `revalidateTag(tag)` sous Next.js 15).

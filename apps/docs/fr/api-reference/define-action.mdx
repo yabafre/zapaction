@@ -23,6 +23,7 @@ export function defineAction<TInput, TOutput, TContext = unknown>(
 | `output` | `ZodType<TOutput>` | Non | Validation runtime de l'output |
 | `name` | `string` | Non | Utilise par le logger |
 | `tags` | `readonly string[]` | Non | Passe a `revalidateTags` |
+| `revalidation` | `RevalidateTagsOptions` | Non | Strategie Next.js 16 (`mode: "revalidate" \| "update"`, `profile`) |
 | `beforeAction` | `(args) => void \| Promise<void>` | Non | Execute avant handler |
 | `afterAction` | `(args) => TOutput \| void \| Promise<TOutput \| void>` | Non | Execute apres handler |
 | `handler` | `({ input, ctx }) => Promise<TOutput>` | Oui | Implementation principale |

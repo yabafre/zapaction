@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -17,9 +16,9 @@
     "resolveJsonModule": true,
     "types": ["vitest/globals"],
     "paths": {
-      "@zapaction/core": ["packages/core/src/index.ts"],
-      "@zapaction/react": ["packages/react/src/index.ts"],
-      "@zapaction/query": ["packages/query/src/index.ts"]
+      "@zapaction/core": ["./packages/core/src/index.ts"],
+      "@zapaction/react": ["./packages/react/src/index.ts"],
+      "@zapaction/query": ["./packages/query/src/index.ts"]
     }
   }
 }
