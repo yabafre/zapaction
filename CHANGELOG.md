@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- Next.js 16 cache revalidation support in `@zapaction/core`:
+  - `revalidateTags(tags, options)` now supports `mode: "revalidate" | "update"` and custom `profile` (`CacheLifeProfile` string or `{ expire?: number }`) for Next.js 16 `revalidateTag(tag, profile)` and `updateTag(tag)`, while keeping automatic fallback to single-argument `revalidateTag(tag)` on Next.js 15.
+  - Added `updateTags(tags)` helper for immediate read-your-own-writes cache expiration inside Next.js 16 Server Actions.
+  - Added optional `revalidation?: RevalidateTagsOptions` option to `defineAction`.
+- Unit tests in `packages/core/src/revalidateTags.test.ts` covering Next.js 16 (`revalidateTag` profiles, `updateTag`/`updateTags`) and Next.js 15 fallback behavior.
+
+### Changed
+- Upgraded monorepo and example dependencies to latest compatible versions:
+  - `next` `^16.4.6`, `react` / `react-dom` `^19.3.1`, `@types/react` `^19.3.0`
+  - `@tanstack/react-query` `^5.108.4`, `zod` `^4.6.7`
+  - `turbo` `^2.11.13`, `tsup` `^9.0.0`, `typescript` `^6.0.3`, `vitest` `^5.1.1`, `vite` `^8.3.8`, `@types/node` `^26.6.6`, `mint` `^4.3.88`
+- Removed deprecated `baseUrl` from `tsconfig.base.json` and migrated `paths` to relative `./` entries for TypeScript 6/7 and `tsup@9` compatibility.
+- Updated GitHub Actions CI Node.js matrix to `[22, 24]`.
+- Updated `examples/next-app` to Next.js 16 with `revalidation: { mode: "update" }` and refreshed EN/FR documentation, READMEs, and `context7.md`.
+
+### Fixed
+- Added explicit `ReactNode` return type to `ActionErrorBoundary.render()` in `@zapaction/react` so generated `.d.ts` declarations remain compatible with both React 18.3 and React 19.
+- Added explicit ESM (`import.types`) and CJS (`require.types`) conditional `exports` entries across `@zapaction/core`, `@zapaction/react`, and `@zapaction/query`.
+- Made `next/cache` feature detection safe under partial Vitest module mocks (`"updateTag" in cache`).
+- Deduplicated workspace peer dependencies in `pnpm-lock.yaml` to prevent dual `@tanstack/react-query` instances under Next.js 16 Turbopack builds.
+
 ## [0.2.3] - 2026-05-20
 
 ### Changed

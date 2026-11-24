@@ -82,6 +82,22 @@ describe("defineAction", () => {
     expect(revalidateTags).toHaveBeenCalledWith(["users", "users"]);
   });
 
+  it("forwards revalidation options to revalidateTags", async () => {
+    setActionContext(() => ({ userId: "u-1" }));
+
+    const action = defineAction({
+      input: z.object({ value: z.string() }),
+      tags: ["todos"],
+      revalidation: { mode: "update" },
+      handler: async ({ input }) => ({
+        ok: input.value,
+      }),
+    });
+
+    await action({ value: "ok" });
+    expect(revalidateTags).toHaveBeenCalledWith(["todos"], { mode: "update" });
+  });
+
   it("does not revalidate when no tags are defined", async () => {
     setActionContext(() => ({ userId: "u-1" }));
 

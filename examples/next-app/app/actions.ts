@@ -66,6 +66,7 @@ export const createTodo = defineAction({
   }),
   output: todoSchema,
   tags: ["todos"],
+  revalidation: { mode: "update" },
   handler: async ({ input }) => {
     const todo: Todo = {
       id: String(nextId++),
@@ -86,6 +87,7 @@ export const toggleTodo = defineAction({
   }),
   output: todoSchema,
   tags: ["todos"],
+  revalidation: { mode: "update" },
   beforeAction: ({ input }) => {
     const exists = todos.some((t) => t.id === input.id);
     if (!exists) throw new Error("Todo not found");
@@ -105,6 +107,7 @@ export const deleteTodo = defineAction({
   }),
   output: z.object({ deleted: z.boolean() }),
   tags: ["todos"],
+  revalidation: { mode: "update" },
   beforeAction: ({ input }) => {
     const exists = todos.some((t) => t.id === input.id);
     if (!exists) throw new Error("Todo not found");

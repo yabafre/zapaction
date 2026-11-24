@@ -2,7 +2,7 @@ import type { ZodType } from "zod";
 
 import { resolveActionContext } from "./context";
 import { createActionLogger } from "./logger";
-import { revalidateTags } from "./revalidateTags";
+import { revalidateTags, type RevalidateTagsOptions } from "./revalidateTags";
 
 function fallbackClone<TInput>(value: TInput): TInput {
   if (Array.isArray(value)) {
@@ -57,6 +57,7 @@ export type DefineActionOptions<TInput, TOutput, TContext> = {
   input: ZodType<TInput>;
   output?: ZodType<TOutput>;
   tags?: readonly string[];
+  revalidation?: RevalidateTagsOptions;
   name?: string;
   beforeAction?: (args: BeforeActionArgs<TInput, TContext>) => void | Promise<void>;
   afterAction?: (
@@ -71,7 +72,7 @@ export type DefineActionOptions<TInput, TOutput, TContext> = {
 export function defineAction<TInput, TOutput, TContext = unknown>(
   options: DefineActionOptions<TInput, TOutput, TContext>,
 ): DefinedAction<TInput, TOutput> {
-  const { input, output, tags, handler, beforeAction, afterAction, name } = options;
+  const { input, output, tags, revalidation, handler, beforeAction, afterAction, name } = options;
 
   const action = async (rawInput: TInput): Promise<TOutput> => {
     const logger = createActionLogger(name ?? "anonymous");
@@ -108,7 +109,11 @@ export function defineAction<TInput, TOutput, TContext = unknown>(
       }
 
       if (tags && tags.length > 0) {
-        await revalidateTags(tags);
+        if (revalidation) {
+          await revalidateTags(tags, revalidation);
+        } else {
+          await revalidateTags(tags);
+        }
         logger.log("revalidation_complete", "debug");
       }
 

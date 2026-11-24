@@ -4,10 +4,10 @@ Keep Next.js Server Actions and React Query in sync.
 
 ## Compatibility
 
-- Next.js `>= 15`
-- React `>= 18.3`
+- Next.js `>= 15` (including Next.js 16)
+- React `>= 18.3` (including React 19)
 - TanStack Query `>= 5`
-- Zod `>= 3`
+- Zod `>= 4`
 
 ## Package Managers
 
@@ -56,10 +56,14 @@ const { data: todos } = useActionQuery(listTodos, {
 - `createFeatureKeys`
 - `createFeatureTags`
 - `revalidateTags`
+- `updateTags`
+- `configureLogger`
 
 ### `@zapaction/react`
 
 - `useAction`
+- `ActionErrorBoundary`
+- `useActionErrorReset`
 
 ### `@zapaction/query`
 
@@ -70,8 +74,8 @@ const { data: todos } = useActionQuery(listTodos, {
 
 ## Repo vs Library Tooling
 
-- Contributors: this monorepo uses `pnpm` + Turborepo.
-- Consumers: the published packages work with npm, pnpm, yarn, and bun.
+- Contributors: this monorepo uses Node.js `>= 22`, `pnpm`, and Turborepo.
+- Consumers: the published packages work with npm, pnpm, yarn, and bun (Next.js 15 & 16, React 18.3 & 19).
 
 ## Monorepo Commands
 

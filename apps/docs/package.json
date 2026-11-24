@@ -10,6 +10,6 @@
     "typecheck": "echo 'Mintlify docs: no TypeScript typecheck required'"
   },
   "devDependencies": {
-    "mint": "^4.2.348"
+    "mint": "^4.3.88"
   }
 }

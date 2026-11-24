@@ -12,10 +12,10 @@ It provides:
 - `useAction`, `useActionQuery`, and `useActionMutation` hooks
 
 Works with:
-- Next.js App Router (`>= 15`)
-- React (`>= 18.3`)
+- Next.js App Router (`>= 15`, including Next.js 16 with `revalidateTag(tag, profile)` and `updateTag(tag)`)
+- React (`>= 18.3`, including React 19)
 - TanStack Query (`>= 5`)
-- Zod (`>= 3`)
+- Zod (`>= 4`)
 - npm, pnpm, yarn, bun
 
 ## Core Concepts

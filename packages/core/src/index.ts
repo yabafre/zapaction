@@ -13,7 +13,13 @@ export {
   createFeatureTags,
   type QueryKey,
 } from "./queryKeys";
-export { revalidateTags } from "./revalidateTags";
+export {
+  revalidateTags,
+  updateTags,
+  type CacheLifeProfile,
+  type RevalidationMode,
+  type RevalidateTagsOptions,
+} from "./revalidateTags";
 export {
   configureLogger,
   type ActionLogEvent,

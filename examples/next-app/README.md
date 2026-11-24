@@ -1,19 +1,18 @@
-# Next.js Real-World Example
+# Next.js 16 Real-World Example
 
-This workspace is a real Next.js App Router application that demonstrates ZapAction in end-to-end flow:
+This workspace is a real Next.js 16 App Router (Turbopack) application that demonstrates ZapAction end-to-end:
 
-- `@zapaction/core` for typed server actions
-- `beforeAction` middleware guards using request context
-- `tags` for server-side cache revalidation
-- `@zapaction/query` (`useActionQuery` + `useActionMutation`) for client cache sync
-- `@zapaction/react` (`useAction` + `ActionErrorBoundary`) for imperative actions and UI safety
+- `@zapaction/core` for typed server actions (`defineAction`, `setActionContext`, `configureLogger`)
+- `beforeAction` middleware validation guards
+- `tags` + `revalidation: { mode: "update" }` for Next.js 16 immediate (`updateTag`) server-side cache invalidation
+- `@zapaction/query` (`useActionQuery` + `useActionMutation` + `setTagRegistry`) for client cache sync
+- `@zapaction/react` (`ActionErrorBoundary` + `useActionErrorReset`) for UI error handling
 
 ## What the app does
 
-- Reads a viewer role (`viewer`/`admin`) from a cookie via `next/headers`
-- Exposes CRUD actions on an in-memory users store
-- Restricts role updates and delete operations to `admin`
-- Uses shared tag invalidation so mutations refresh the users query automatically
+- Exposes typed CRUD todo actions (`listTodos`, `createTodo`, `toggleTodo`, `deleteTodo`) on an in-memory store
+- Validates inputs and outputs at runtime with Zod v4
+- Uses shared `todos` cache tags so mutations automatically refresh server cache (`updateTag`) and client TanStack Query cache
 
 ## Run
 
@@ -26,6 +25,7 @@ Open <http://localhost:3000>.
 
 ## File map
 
-- `app/actions.ts`: server actions, middleware, context, schemas
-- `app/providers.tsx`: `QueryClientProvider` + tag registry
-- `components/users-panel.tsx`: full client flow (query, mutation, useAction, error boundary)
+- `app/actions.ts`: server actions, `beforeAction` guards, context, schemas, and Next.js 16 `revalidation` options
+- `app/providers.tsx`: `QueryClientProvider` + `setTagRegistry`
+- `app/query-keys.ts`: typed query key factory
+- `components/todo-panel.tsx`: client flow (`useActionQuery`, `useActionMutation`, `ActionErrorBoundary`)

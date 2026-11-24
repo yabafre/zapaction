@@ -37,11 +37,26 @@ export const updateTodo = defineAction({
 
 ## Server revalidation
 
-`defineAction` triggers `revalidateTags(tags)` when tags are present.
+`defineAction` triggers `revalidateTags(tags, revalidation)` when tags are present.
 
 ```ts packages/core/src/revalidateTags.ts
-export async function revalidateTags(tags?: readonly string[]): Promise<void>
+export type CacheLifeProfile = string | { expire?: number };
+export type RevalidationMode = "revalidate" | "update";
+export type RevalidateTagsOptions = {
+  mode?: RevalidationMode;
+  profile?: CacheLifeProfile;
+};
+
+export async function revalidateTags(
+  tags?: readonly string[],
+  options?: RevalidateTagsOptions
+): Promise<void>
+
+export async function updateTags(tags?: readonly string[]): Promise<void>
 ```
+
+- **Default (`mode: "revalidate"`)**: calls Next.js 16 `revalidateTag(tag, profile)` (defaults to `"max"` for stale-while-revalidate; works in Server Actions and Route Handlers) and falls back to single-argument `revalidateTag(tag)` on Next.js 15.
+- **Immediate (`mode: "update"` or `updateTags`)**: calls Next.js 16 `updateTag(tag)` for read-your-own-writes expiration inside Server Actions (falls back to `revalidateTag(tag)` on Next.js 15).
 
 ## Client invalidation
 

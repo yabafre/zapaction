@@ -36,7 +36,7 @@ export class ActionErrorBoundary extends Component<ActionErrorBoundaryProps, Sta
     this.setState({ hasError: false, error: undefined });
   };
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
       const ctx: ActionErrorContextValue = {
         error: this.state.error,
